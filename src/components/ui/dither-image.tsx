@@ -15,8 +15,6 @@ import {
     type Shockwave,
 } from "@/lib/particle-system";
 import { useIsMobile } from "@/lib/use-is-mobile";
-import { useSpaceMode } from "@/components/layout/space-mode";
-import { useSpaceTime } from "@/components/layout/space-time";
 
 interface DitherImageProps {
     src: string;
@@ -89,8 +87,6 @@ export function DitherImage({
     const runningRef = useRef(false);
     const isMobile = useIsMobile();
     const { resolvedTheme } = useTheme();
-    const { enabled: spaceMode } = useSpaceMode();
-    const { time: spaceTime } = useSpaceTime();
 
     /* The render loop and the resize handler are long-lived closures built
        once, so they cannot see a later render's value; the current dot colour
@@ -100,17 +96,10 @@ export function DitherImage({
        order, so the mirror is current by the time they run. */
     const dotColorRef = useRef({ r: 232, g: 225, b: 215 });
     useEffect(() => {
-        // Night space mode forces dark mode anyway, but the warm off-white
-        // tuned for a plain dark slate background reads as a flat cream
-        // sticker against a starfield — a cool starlight tint belongs there
-        // instead. Day mode forces light mode, where the existing warm-brown
-        // light-theme colour already suits a bright sky, so it falls through.
-        dotColorRef.current = spaceMode && spaceTime === "night"
-            ? { r: 222, g: 232, b: 248 }  // cool starlight blue-white
-            : resolvedTheme === "light"
+        dotColorRef.current = resolvedTheme === "light"
             ? { r: 50, g: 42, b: 32 }     // #322a20 — warm dark brown
             : { r: 232, g: 225, b: 215 };  // #e8e1d7 — warm off-white
-    }, [resolvedTheme, spaceMode, spaceTime]);
+    }, [resolvedTheme]);
 
     const startLoop = useCallback(() => {
         if (runningRef.current) return;
@@ -324,7 +313,7 @@ export function DitherImage({
         const rect = canvas.getBoundingClientRect();
         const dpr = window.devicePixelRatio || 1;
         renderDots(ctx, sys, CONFIG.invert, rect.width, rect.height, dpr, dotColorRef.current);
-    }, [resolvedTheme, spaceMode, spaceTime]);
+    }, [resolvedTheme]);
 
     return (
         <canvas

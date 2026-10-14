@@ -1,17 +1,17 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { useSpaceMode } from "@/components/layout/space-mode";
+import { useSound } from "@/components/layout/sound";
 
 /** Procedurally synthesized deep-space drone — no external audio file.
  *  Detuned sub-oscillators beating against each other, a slow filter sweep,
- *  and a quiet filtered-noise layer for texture. Space mode is on by
- *  default now, so the AudioContext is created on mount rather than from a
- *  click — browsers still won't let it actually produce sound until a user
+ *  and a quiet filtered-noise layer for texture. Sound is on by default,
+ *  so the AudioContext is created on mount rather than from a click —
+ *  browsers still won't let it actually produce sound until a user
  *  gesture happens, so it starts suspended and resumes on the visitor's
  *  first click/key/touch/scroll, whichever comes first. */
 export function SpaceAudio() {
-    const { enabled } = useSpaceMode();
+    const { enabled } = useSound();
     const ctxRef = useRef<AudioContext | null>(null);
     const stopFnRef = useRef<(() => void) | null>(null);
 

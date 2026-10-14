@@ -1,20 +1,20 @@
 "use client";
 
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Rocket01Icon } from "@hugeicons/core-free-icons";
-import { useSpaceMode } from "@/components/layout/space-mode";
+import { VolumeHighIcon, VolumeMute02Icon } from "@hugeicons/core-free-icons";
+import { useSound } from "@/components/layout/sound";
 import { cn } from "@/lib/utils";
 
-export function SpaceToggle() {
-    const { enabled, toggle } = useSpaceMode();
+export function SoundToggle() {
+    const { enabled, toggle } = useSound();
 
     return (
         <button
             type="button"
             onClick={toggle}
             aria-pressed={enabled}
-            aria-label={enabled ? "Turn off space mode" : "Turn on space mode"}
-            title={enabled ? "Turn off space mode" : "Turn on space mode"}
+            aria-label={enabled ? "Mute ambient sound" : "Play ambient sound"}
+            title={enabled ? "Mute ambient sound" : "Play ambient sound"}
             className={cn(
                 "fixed bottom-4 left-4 z-[9999] flex size-10 items-center justify-center rounded-full shadow-lg backdrop-blur-md transition-transform duration-200 hover:scale-110 active:scale-95",
                 enabled ? "text-accent-primary" : "text-text-secondary",
@@ -24,7 +24,7 @@ export function SpaceToggle() {
                 border: "1px solid var(--border-default)",
             }}
         >
-            <HugeiconsIcon icon={Rocket01Icon} size={16} />
+            <HugeiconsIcon icon={enabled ? VolumeHighIcon : VolumeMute02Icon} size={16} />
         </button>
     );
 }
