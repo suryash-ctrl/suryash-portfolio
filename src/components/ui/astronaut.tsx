@@ -1,10 +1,20 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 import { useSpaceMode } from "@/components/layout/space-mode";
 import { useSpaceTime } from "@/components/layout/space-time";
 import { useMotionPreference } from "@/components/layout/motion-preference";
 import { useParallax } from "@/components/layout/parallax";
+
+/** One full 360° turn mapped across the whole page's scroll range — spring-
+ *  smoothed so a fast scroll-wheel flick doesn't snap it, a real spin of
+ *  the flat illustration (there's no 3D model or photo set behind this,
+ *  just the same SVG rotating in its own plane). */
+function useScrollSpin() {
+    const { scrollYProgress } = useScroll();
+    const raw = useTransform(scrollYProgress, [0, 1], [0, 360]);
+    return useSpring(raw, { stiffness: 60, damping: 20, mass: 0.5 });
+}
 
 /** A slowly counter-rotating pair of triangles behind the astronaut — a
  *  quiet sacred-geometry echo, glowing in the site's own accent colour.
@@ -90,20 +100,22 @@ function AstronautSvg() {
 
 function NightAstronaut() {
     const parallax = useParallax(16);
+    const spin = useScrollSpin();
     return (
         <motion.div aria-hidden="true" className="pointer-events-none fixed top-0 left-0 z-40" style={{ x: parallax.x, y: parallax.y }}>
             <motion.div
                 animate={{
                     x: ["6vw", "68vw", "40vw", "82vw", "6vw"],
                     y: ["12vh", "32vh", "62vh", "22vh", "12vh"],
-                    rotate: [-6, 12, -14, 8, -6],
                 }}
                 transition={{ duration: 55, repeat: Infinity, ease: "easeInOut" }}
             >
                 <div className="relative flex items-center justify-center">
                     <GeometryHalo />
                     <motion.div className="relative" animate={{ y: [0, -10, 0] }} transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}>
-                        <AstronautSvg />
+                        <motion.div style={{ rotate: spin }}>
+                            <AstronautSvg />
+                        </motion.div>
                     </motion.div>
                 </div>
             </motion.div>
@@ -117,6 +129,7 @@ function NightAstronaut() {
  *  using anyone else's photo. */
 function DayAstronaut() {
     const parallax = useParallax(10);
+    const spin = useScrollSpin();
     return (
         <motion.div
             aria-hidden="true"
@@ -127,7 +140,9 @@ function DayAstronaut() {
             style={{ left: "26vw", bottom: "2vh", x: parallax.x, y: parallax.y, rotate: -78 }}
         >
             <motion.div animate={{ rotate: [0, 1.5, 0] }} transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}>
-                <AstronautSvg />
+                <motion.div style={{ rotate: spin }}>
+                    <AstronautSvg />
+                </motion.div>
             </motion.div>
         </motion.div>
     );
