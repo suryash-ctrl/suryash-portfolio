@@ -1,3 +1,4 @@
+import { ScrollOrbitHero } from "@/components/sections/scroll-orbit-hero";
 import { HeroIntro } from "@/components/sections/hero-intro";
 import { MarqueeStrip } from "@/components/sections/marquee-strip";
 import { HeroBanner } from "@/components/sections/hero-banner";
@@ -15,8 +16,11 @@ import { MotionProvider } from "@/components/layout/motion-provider";
 export default function Home() {
     return (
         <MotionProvider>
-            <main className="mx-auto flex w-full max-w-2xl flex-col px-6 pt-12 pb-0">
-                <HeroIntro />
+            <main className="mx-auto flex w-full max-w-2xl flex-col px-6 pt-0 pb-0">
+                <ScrollOrbitHero />
+                <div className="mt-12">
+                    <HeroIntro />
+                </div>
                 <div className="mt-8">
                     <MarqueeStrip />
                 </div>

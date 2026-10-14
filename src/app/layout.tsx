@@ -15,8 +15,6 @@ import { CursorTrail } from "@/components/ui/cursor-trail";
 import { Starfield } from "@/components/ui/starfield";
 import { DaySky } from "@/components/ui/day-sky";
 import { MeadowStrip } from "@/components/ui/meadow-strip";
-import { Astronaut } from "@/components/ui/astronaut";
-import { Cat } from "@/components/ui/cat";
 import { Planets } from "@/components/ui/planets";
 import { BlackHole } from "@/components/ui/black-hole";
 import { Asteroids } from "@/components/ui/asteroids";
@@ -103,8 +101,6 @@ export default function RootLayout({
                                     <Planets />
                                     <Asteroids />
                                     <MeadowStrip />
-                                    <Astronaut />
-                                    <Cat />
                                     <SpaceAudio />
                                     <Navbar />
                                     <ThemeKeys />
