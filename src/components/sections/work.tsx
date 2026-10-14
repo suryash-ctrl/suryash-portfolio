@@ -16,7 +16,7 @@ function WorkCard({ item, index }: { item: WorkItem; index: number }) {
     return (
         <motion.div
             ref={ref}
-            className="group relative flex flex-col overflow-hidden border border-border-default bg-bg-secondary transition-[border-color,transform] duration-300 ease-out hover:-translate-y-0.5 hover:border-border-strong"
+            className="group relative flex flex-col overflow-hidden border border-border-default glass transition-[border-color,transform] duration-300 ease-out hover:-translate-y-0.5 hover:border-border-strong"
             initial={{ opacity: 0, y: 20 }}
             animate={inView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.5, delay: index * 0.08, ease }}

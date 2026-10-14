@@ -132,7 +132,7 @@ function WorkCard({ entry, index }: { entry: ExperienceEntry; index: number }) {
         <motion.div
             ref={ref}
             layout
-            className="min-w-0 flex-1 border border-border-default bg-bg-secondary p-5 motion-safe:transition-[border-color] motion-safe:duration-200 group-hover:border-border-strong"
+            className="min-w-0 flex-1 border border-border-default glass p-5 motion-safe:transition-[border-color] motion-safe:duration-200 group-hover:border-border-strong"
             initial={{ opacity: 0, y: 16 }}
             animate={inView ? { opacity: 1, y: 0 } : {}}
             exit={{ opacity: 0, y: -8 }}

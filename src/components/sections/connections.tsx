@@ -131,7 +131,7 @@ function SignalBoard() {
                             target={node.external ? "_blank" : undefined}
                             rel={node.external ? "noopener noreferrer" : undefined}
                             aria-label={node.label}
-                            className="relative flex h-12 w-12 items-center justify-center border border-border-default bg-bg-secondary transition-all duration-300 hover:border-accent-primary min-[480px]:h-14 min-[480px]:w-14"
+                            className="relative flex h-12 w-12 items-center justify-center border border-border-default glass transition-all duration-300 hover:border-accent-primary min-[480px]:h-14 min-[480px]:w-14"
                             style={{ transform: `scale(${scale})`, transition: "transform 0.3s ease-out, border-color 0.3s ease-out" }}
                             onMouseEnter={() => setHoveredNode(node.id)}
                             onMouseLeave={() => setHoveredNode(null)}
@@ -164,7 +164,7 @@ function MobileConnections() {
                     download={node.download}
                     target={node.external ? "_blank" : undefined}
                     rel={node.external ? "noopener noreferrer" : undefined}
-                    className="flex flex-col items-center gap-2 border border-border-default bg-bg-secondary p-4 transition-colors duration-200 hover:border-accent-primary"
+                    className="flex flex-col items-center gap-2 border border-border-default glass p-4 transition-colors duration-200 hover:border-accent-primary"
                     initial={{ opacity: 0, y: 12 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.3, delay: i * 0.06, ease }}
@@ -192,7 +192,7 @@ function ContactForm() {
     };
 
     const inputClass =
-        "w-full border border-border-default bg-bg-secondary px-3 py-2 font-space text-[14px] text-text-primary placeholder:text-text-muted transition-colors duration-200 focus-visible:border-accent-primary";
+        "w-full border border-border-default glass px-3 py-2 font-space text-[14px] text-text-primary placeholder:text-text-muted transition-colors duration-200 focus-visible:border-accent-primary";
 
     return (
         <form onSubmit={handleSubmit} className="mt-8 flex flex-col gap-3">

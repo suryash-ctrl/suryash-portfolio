@@ -22,14 +22,13 @@ export const PRESENT = { month: 12, year: TIMELINE_END_YEAR } as const;
 export const experience: ExperienceEntry[] = [
     {
         type: "work",
-        company: "UPS Global Business Services",
-        role: "Senior Marketing & Operations Specialist",
+        company: "United Parcel Service (Global Business Solution, Pune 1)",
+        role: "Senior Marketing",
         startDate: { month: 1, year: 2026 },
         endDate: { month: 7, year: 2026 },
-        badges: ["SENIOR MARKETING & OPERATIONS", "PUNE", "ENTERPRISE OPERATIONS"],
+        badges: ["SENIOR MARKETING", "PUNE", "20 GLOBAL ACCOUNTS"],
         categories: ["marketing", "operations"],
         barColor: "accent",
-        barLabel: "CONTRACT",
         bullets: [
             "managed workflows and **revenue assurance** for **20 global enterprise accounts** — including **Amazon**, **Apple**, **Louis Vuitton** and **Nike** — across **EMEA**, **AMER** and **APAC**",
             "coordinated cross-functional teams across **India**, **APAC** and **Europe**, keeping operations and project delivery on schedule",
@@ -42,13 +41,12 @@ export const experience: ExperienceEntry[] = [
     {
         type: "work",
         company: "NoBroker Interiors",
-        role: "Client Manager · Revenue & Acquisition",
+        role: "Client Manager",
         startDate: { month: 10, year: 2025 },
         endDate: { month: 1, year: 2026 },
         badges: ["CLIENT MANAGER", "PUNE", "CUSTOMER LIFECYCLE"],
         categories: ["marketing", "customer-success"],
         barColor: "gray",
-        barLabel: "FULLTIME",
         bullets: [
             "owned the end-to-end sales cycle for residential interior projects — first call, requirement analysis, negotiation, deal closure, handover",
             "worked toward a monthly revenue target of **₹70 lakh**, converting qualified leads and negotiating commercial terms to close interior design projects",

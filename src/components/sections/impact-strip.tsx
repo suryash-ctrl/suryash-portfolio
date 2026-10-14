@@ -13,11 +13,11 @@ interface Stat {
 }
 
 const STATS: Stat[] = [
-    { prefix: "$", value: 3, suffix: "B+", label: "ANNUAL CONTRACT VALUE MANAGED" },
+    { prefix: "$", value: 50, suffix: "M+", label: "BILLING PORTFOLIO VALIDATED" },
+    { value: 20, suffix: "", label: "GLOBAL ENTERPRISE ACCOUNTS" },
     { value: 99, suffix: "%", label: "DATA ACCURACY" },
     { prefix: "₹", value: 70, suffix: "L/MO", label: "NOBROKER REVENUE TARGET" },
-    { value: 2, suffix: "HR", label: "ESCALATION SLA" },
-];
+    ];
 
 function useCountUp(target: number, start: boolean) {
     const [value, setValue] = useState(0);
@@ -67,7 +67,7 @@ function StatTile({ stat, index }: { stat: Stat; index: number }) {
             onPointerMove={handleMove}
             onPointerLeave={handleLeave}
             style={{ rotateX: springX, rotateY: springY, transformPerspective: 600 }}
-            className="flex flex-col gap-2 border border-border-default bg-bg-secondary p-4"
+            className="flex flex-col gap-2 border border-border-default glass p-4"
         >
             <span className="font-jetbrains text-[26px] font-semibold leading-none text-accent-primary min-[480px]:text-[32px]">
                 {stat.prefix}

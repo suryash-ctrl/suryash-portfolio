@@ -23,7 +23,7 @@ export default function OgImage() {
                 </span>
                 <span style={{ color: "#f4f7fa", fontSize: 108, fontWeight: 700, marginTop: 28 }}>Suryash Raj</span>
                 <div style={{ display: "flex", marginTop: 48, gap: 18 }}>
-                    {["UPS Global Business Services", "NoBroker Interiors", "Botmatic Solutions"].map((t) => (
+                    {["United Parcel Service", "NoBroker Interiors", "Botmatic Solutions"].map((t) => (
                         <span
                             key={t}
                             style={{

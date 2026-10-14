@@ -18,7 +18,7 @@ function Chip({ label, delay }: { label: string; delay: number }) {
             onPointerUp={() => setPressed(false)}
             onPointerLeave={() => setPressed(false)}
             style={{ scale: pressed ? 0.95 : 1 }}
-            className="cursor-default select-none border border-border-default bg-bg-secondary px-2.5 py-1 font-jetbrains text-[11px] uppercase tracking-wide text-text-secondary transition-colors duration-150 hover:border-accent-primary hover:text-text-primary"
+            className="cursor-default select-none border border-border-default glass px-2.5 py-1 font-jetbrains text-[11px] uppercase tracking-wide text-text-secondary transition-colors duration-150 hover:border-accent-primary hover:text-text-primary"
         >
             {label}
         </motion.span>

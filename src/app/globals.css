@@ -320,3 +320,69 @@ body {
     animation: visor-scan .4s linear infinite; mix-blend-mode: screen;
 }
 @media (prefers-reduced-motion: reduce) { .visor-idle, .visor-burst, .visor-scan { animation: none } }
+
+/* ── Glass ─────────────────────────────────────────────────────────── */
+.glass {
+    background: linear-gradient(135deg, oklch(1 0 0 / 0.075), oklch(1 0 0 / 0.025));
+    border: 1px solid oklch(1 0 0 / 0.13);
+    -webkit-backdrop-filter: blur(20px) saturate(150%);
+    backdrop-filter: blur(20px) saturate(150%);
+    box-shadow: inset 0 1px 0 oklch(1 0 0 / 0.1), 0 14px 44px -14px oklch(0 0 0 / 0.65);
+}
+.glass:hover { border-color: oklch(1 0 0 / 0.24); }
+
+/* ── Frame-by-frame glitch (steps(1) = hold each keyframe, no tweening) ── */
+.glitch-word { position: relative; }
+.glitch-word::before,
+.glitch-word::after {
+    content: attr(data-text);
+    position: absolute; inset: 0;
+    opacity: 0;
+    pointer-events: none;
+}
+.glitch-word.is-live::before { color: #ff2d6f; mix-blend-mode: screen; animation: glitch-a 2.4s steps(1) infinite; opacity: 1; }
+.glitch-word.is-live::after  { color: #25f4ee; mix-blend-mode: screen; animation: glitch-b 2.4s steps(1) infinite; opacity: 1; }
+.glitch-word.is-live { animation: glitch-base 2.4s steps(1) infinite; }
+@keyframes glitch-base {
+    0%, 100% { transform: none }
+    41.6% { transform: translate(-0.6%, 0) skewX(-4deg) }
+    45.8% { transform: translate(0.8%, 0) }
+    50%   { transform: none }
+    83.3% { transform: translate(0.5%, 0.6%) }
+    87.5% { transform: none }
+}
+@keyframes glitch-a {
+    0%, 100% { clip-path: inset(0 0 100% 0); transform: none }
+    8.3%  { clip-path: inset(12% 0 70% 0); transform: translate(-2.2%, 0) }
+    16.6% { clip-path: inset(60% 0 22% 0); transform: translate(1.6%, 0) }
+    25%   { clip-path: inset(0 0 100% 0) }
+    41.6% { clip-path: inset(30% 0 40% 0); transform: translate(-3.4%, 0) }
+    45.8% { clip-path: inset(70% 0 8% 0); transform: translate(2.8%, 0) }
+    50%   { clip-path: inset(0 0 100% 0) }
+    66.6% { clip-path: inset(44% 0 44% 0); transform: translate(-1.2%, 0) }
+    75%   { clip-path: inset(0 0 100% 0) }
+    83.3% { clip-path: inset(5% 0 80% 0); transform: translate(3%, 0) }
+    91.6% { clip-path: inset(0 0 100% 0) }
+}
+@keyframes glitch-b {
+    0%, 100% { clip-path: inset(0 0 100% 0); transform: none }
+    12.5% { clip-path: inset(48% 0 38% 0); transform: translate(2.4%, 0) }
+    20.8% { clip-path: inset(0 0 100% 0) }
+    33.3% { clip-path: inset(20% 0 62% 0); transform: translate(-1.8%, 0) }
+    41.6% { clip-path: inset(62% 0 18% 0); transform: translate(3.2%, 0) }
+    45.8% { clip-path: inset(10% 0 74% 0); transform: translate(-2.6%, 0) }
+    54.1% { clip-path: inset(0 0 100% 0) }
+    70.8% { clip-path: inset(36% 0 50% 0); transform: translate(1.4%, 0) }
+    79.1% { clip-path: inset(0 0 100% 0) }
+    87.5% { clip-path: inset(80% 0 2% 0); transform: translate(-3%, 0) }
+    95.8% { clip-path: inset(0 0 100% 0) }
+}
+@media (prefers-reduced-motion: reduce) {
+    .glitch-word.is-live, .glitch-word.is-live::before, .glitch-word.is-live::after { animation: none }
+}
+
+@keyframes blob-drift-a { 0%,100% { transform: translate(0,0) scale(1) } 50% { transform: translate(8vw,10vh) scale(1.15) } }
+@keyframes blob-drift-b { 0%,100% { transform: translate(0,0) scale(1.1) } 50% { transform: translate(-9vw,-8vh) scale(0.95) } }
+.blob-a { animation: blob-drift-a 26s ease-in-out infinite }
+.blob-b { animation: blob-drift-b 32s ease-in-out infinite }
+@media (prefers-reduced-motion: reduce) { .blob-a, .blob-b { animation: none } }

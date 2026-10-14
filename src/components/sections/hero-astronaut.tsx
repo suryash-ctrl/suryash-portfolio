@@ -5,96 +5,104 @@ import { createPortal } from "react-dom";
 import { m as motion, AnimatePresence, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { SOCIAL } from "@/config/links";
 import { useSound } from "@/components/layout/sound";
+import { answer, SUGGESTIONS } from "@/content/assistant";
+import { VisorCanvas, type VisorSignal } from "@/components/sections/visor-canvas";
 
-const GREETING = "Hello, this is Suryash. I knew you'd come back. I have that effect on people. So, what's the ask?";
-
-const OPTIONS = [
-    { label: "Hire me", reply: "Smart move. Taking you to the contact desk.", href: "#contact" },
-    { label: "See the work", reply: "Six automations, built and running. Opening the work.", href: "#work" },
-    { label: "Walk me through experience", reply: "UPS, NoBroker, Botmatic. In that order. Here we go.", href: "#experience" },
-    { label: "What can you do?", reply: "Marketing, operations and customer success. Let me show you.", href: "#capabilities" },
-    { label: "Get the CV", reply: "One page. No fluff. Downloading.", href: "/Suryash-Raj-Resume.pdf" },
+const INTRO = [
+    { src: "/audio/intro-1.m4a", text: "Oh, hi! I'm Suryash's AI assistant." },
+    { src: "/audio/intro-2.m4a", text: "Basically, I run this place." },
+    { src: "/audio/intro-3.m4a", text: "I knew you'd come back. I have that effect on people. So, what's the ask?" },
 ] as const;
 
-// what flickers on the visor, in rotation
-const VISOR = ["😀", "{ }", "🚀", "01101", "😎", "</>", "👾", "ROAS 4.2x", "🤖", "$ ./ship", "✨", "SLA OK", "🧠", "404", "📈", "const you = new Hire()"];
+const OPTIONS = [
+    { label: "Full-time", src: "/audio/reply-fulltime.m4a", reply: "Full time. Good choice. Opening the contact desk, so you can reach Suryash directly.", href: "#contact" },
+    { label: "Project work", src: "/audio/reply-project.m4a", reply: "Project work. Even better. Let's get you to the contact desk.", href: "#contact" },
+    { label: "Work experience", src: "/audio/reply-experience.m4a", reply: "Work experience. United Parcel Service, NoBroker Interiors, and Botmatic. Here we go.", href: "#experience" },
+    { label: "Projects", src: "/audio/reply-projects.m4a", reply: "Projects. Six automations, built and running. Let me show you.", href: "#work" },
+] as const;
 
-function pickVoice(): SpeechSynthesisVoice | null {
-    const voices = window.speechSynthesis.getVoices().filter((v) => v.lang.toLowerCase().startsWith("en"));
-    const male = /daniel|alex|fred|david|mark|guy|james|google uk english male|male|arthur|aaron|gordon/i;
-    return voices.find((v) => male.test(v.name)) ?? voices.find((v) => v.lang === "en-GB") ?? voices[0] ?? null;
+const TYPE_MS = 42;
+const ease = [0.16, 1, 0.3, 1] as const;
+const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
+
+function playClip(src: string): Promise<void> {
+    return new Promise((resolve) => {
+        try {
+            const a = new Audio(src);
+            const done = () => resolve();
+            a.onended = done;
+            a.onerror = done;
+            setTimeout(done, 15000); // never hang the sequence
+            a.play().catch(done);
+        } catch {
+            resolve();
+        }
+    });
 }
 
-function speak(text: string) {
-    if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
-    try {
-        window.speechSynthesis.cancel();
-        const u = new SpeechSynthesisUtterance(text);
-        const v = pickVoice();
-        if (v) u.voice = v;
-        u.lang = v?.lang ?? "en-US";
-        u.pitch = 0.78; // lower, male register even on neutral voices
-        u.rate = 0.94;
-        u.volume = 1;
-        window.speechSynthesis.speak(u);
-    } catch {
-        // speech is a bonus; the text still shows
-    }
-}
-
-function Typewriter({ text, speedMs = 38 }: { text: string; speedMs?: number }) {
+/** Types `text` out; if the text only grew (same prefix) it carries on from where it was. */
+function Typewriter({ text, onDone, caret = true }: { text: string; onDone?: () => void; caret?: boolean }) {
     const [n, setN] = useState(0);
+    const prev = useRef("");
+    const cb = useRef(onDone);
     useEffect(() => {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        setN(0);
-        const id = setInterval(() => setN((c) => (c >= text.length ? (clearInterval(id), c) : c + 1)), speedMs);
+        cb.current = onDone;
+    });
+    useEffect(() => {
+        let start = text.startsWith(prev.current) ? prev.current.length : 0;
+        prev.current = text;
+        setN(start);
+        if (start >= text.length) {
+            cb.current?.();
+            return;
+        }
+        const id = setInterval(() => {
+            start++;
+            setN(start);
+            if (start >= text.length) {
+                clearInterval(id);
+                cb.current?.();
+            }
+        }, TYPE_MS);
         return () => clearInterval(id);
-    }, [text, speedMs]);
+    }, [text]);
     return (
         <>
             {text.slice(0, n)}
-            <span className="ml-1 inline-block h-[0.9em] w-[0.5em] translate-y-[0.1em] animate-pulse bg-text-primary" aria-hidden="true" />
+            {caret && <span className="ml-1 inline-block h-[0.85em] w-[0.45em] translate-y-[0.08em] animate-pulse bg-text-primary" aria-hidden="true" />}
         </>
     );
 }
 
-function VisorGlitch() {
-    const [i, setI] = useState(0);
-    const [burst, setBurst] = useState(false);
-    useEffect(() => {
-        const id = setInterval(() => {
-            setBurst(true);
-            setTimeout(() => {
-                setI((c) => (c + 1 + Math.floor(Math.random() * 3)) % VISOR.length);
-                setBurst(false);
-            }, 140);
-        }, 1700);
-        return () => clearInterval(id);
-    }, []);
-    const item = VISOR[i];
-    const code = /[{}<>$/]|\d/.test(item) && item.length > 2;
-    const long = item.length > 6;
-    return (
-        <div className="pointer-events-none absolute inset-[6%] flex items-center justify-center overflow-hidden rounded-[45%]" aria-hidden="true">
-            <span
-                className={`select-none font-jetbrains leading-none whitespace-nowrap ${long ? "text-[min(0.8vw,8px)]" : code ? "text-[min(1.3vw,12px)] tracking-tight" : "text-[min(3.2vw,34px)]"} ${burst ? "visor-burst" : "visor-idle"}`}
-                style={{ color: "oklch(0.88 0.12 185)", textShadow: "-1.5px 0 #ff2d6f, 1.5px 0 #25f4ee, 0 0 12px oklch(0.8 0.14 185 / 0.8)" }}
-            >
-                {item}
-            </span>
-            <span className="visor-scan absolute inset-0" />
-        </div>
-    );
-}
+type Msg = { role: "you" | "bot"; text: string };
 
 export function HeroAstronaut() {
     const { enabled } = useSound();
+    const [mounted, setMounted] = useState(false);
     const [started, setStarted] = useState(false);
-    const [line, setLine] = useState(GREETING);
+    const [prev, setPrev] = useState("");
+    const [cur, setCur] = useState("");
     const [showOptions, setShowOptions] = useState(false);
-    const sceneRef = useRef<HTMLDivElement>(null);
+    const [busy, setBusy] = useState(false);
+    const [copied, setCopied] = useState(false);
+    const [log, setLog] = useState<Msg[]>([]);
+    const [draft, setDraft] = useState("");
+    const logRef = useRef<HTMLDivElement>(null);
+    const headRef = useRef<HTMLDivElement>(null);
+    const typingDone = useRef<(() => void) | null>(null);
+    const alive = useRef(true);
+    const signal = useRef<VisorSignal>({ nx: 0, ny: 0, dist: 0 });
 
-    // lock page scroll until the visitor enters
+    useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setMounted(true);
+        alive.current = true;
+        return () => {
+            alive.current = false;
+        };
+    }, []);
+
+    // the page stays put until the visitor presses start
     useEffect(() => {
         document.documentElement.style.overflow = started ? "" : "hidden";
         return () => {
@@ -102,49 +110,75 @@ export function HeroAstronaut() {
         };
     }, [started]);
 
-    // preload voices
-    useEffect(() => {
-        if ("speechSynthesis" in window) window.speechSynthesis.getVoices();
-    }, []);
+    /** show `text` (typed) and play `src` together; resolves when both finish */
+    const say = useCallback(
+        (text: string, src?: string) =>
+            new Promise<void>((resolve) => {
+                let pending = 2;
+                const one = () => {
+                    pending -= 1;
+                    if (pending === 0) resolve();
+                };
+                typingDone.current = one;
+                setCur(text);
+                if (src && enabled) playClip(src).then(one);
+                else one();
+            }),
+        [enabled],
+    );
 
-    const start = useCallback(() => {
+    const begin = useCallback(async () => {
         setStarted(true);
-        if (enabled) speak(GREETING);
-        // options appear as the greeting finishes typing
-        setTimeout(() => setShowOptions(true), GREETING.length * 38 + 400);
-    }, [enabled]);
+        await sleep(1100); // let the start transition play out
+        await say(INTRO[0].text, INTRO[0].src);
+        if (!alive.current) return;
+        await sleep(200);
+        await say(`${INTRO[0].text} ${INTRO[1].text}`, INTRO[1].src);
+        if (!alive.current) return;
+        await sleep(350);
+        setPrev(`${INTRO[0].text} ${INTRO[1].text}`);
+        await say(INTRO[2].text, INTRO[2].src);
+        if (!alive.current) return;
+        setShowOptions(true);
+    }, [say]);
 
-    // head tracking: pointer (or a slow idle look-around) → springs
+    // head tracking: cursor (or a slow idle look-around) drives springs
     const tx = useMotionValue(0);
     const ty = useMotionValue(0);
-    const sx = useSpring(tx, { stiffness: 90, damping: 16, mass: 0.6 });
-    const sy = useSpring(ty, { stiffness: 90, damping: 16, mass: 0.6 });
-    const rotY = useTransform(sx, [-1, 1], [-30, 30]);
-    const rotX = useTransform(sy, [-1, 1], [14, -14]);
-    const moveX = useTransform(sx, [-1, 1], ["-5%", "5%"]);
-    const visorX = useTransform(sx, [-1, 1], ["-14%", "14%"]);
-    const visorY = useTransform(sy, [-1, 1], ["-10%", "10%"]);
+    const sx = useSpring(tx, { stiffness: 85, damping: 15, mass: 0.7 });
+    const sy = useSpring(ty, { stiffness: 85, damping: 15, mass: 0.7 });
+    const rotY = useTransform(sx, [-1, 1], [-26, 26]);
+    const rotX = useTransform(sy, [-1, 1], [13, -13]);
+    const rotZ = useTransform(sx, [-1, 1], [-3, 3]);
+    const headX = useTransform(sx, [-1, 1], ["-3%", "3%"]);
+    const headY = useTransform(sy, [-1, 1], ["-1.5%", "1.5%"]);
+    const bodyX = useTransform(sx, [-1, 1], ["0.8%", "-0.8%"]);
 
     useEffect(() => {
-        let last = performance.now();
+        if (!started) return;
+        let lastMove = performance.now() - 5000;
+        let lastPt: [number, number] | null = null;
         let raf = 0;
-        const start = last;
+        const t0 = performance.now();
         const onMove = (e: PointerEvent) => {
-            last = performance.now();
-            const el = sceneRef.current;
+            lastMove = performance.now();
+            const el = headRef.current;
             if (!el) return;
             const r = el.getBoundingClientRect();
-            // normalise against the helmet itself so the gaze tracks the pointer
-            const hx = r.left + r.width * 0.5 + 0;
-            const hy = r.top + r.height * 0.32;
-            tx.set(Math.max(-1, Math.min(1, (e.clientX - hx) / (window.innerWidth * 0.45))));
-            ty.set(Math.max(-1, Math.min(1, (e.clientY - hy) / (window.innerHeight * 0.45))));
+            const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+            const nx = Math.max(-1, Math.min(1, (e.clientX - cx) / (window.innerWidth * 0.5)));
+            const ny = Math.max(-1, Math.min(1, (e.clientY - cy) / (window.innerHeight * 0.5)));
+            tx.set(nx); ty.set(ny);
+            signal.current.nx = nx; signal.current.ny = ny;
+            if (lastPt) signal.current.dist += Math.hypot(e.clientX - lastPt[0], e.clientY - lastPt[1]);
+            lastPt = [e.clientX, e.clientY];
         };
         const tick = (now: number) => {
-            if (now - last > 2500) {
-                const t = (now - start) / 1000;
-                tx.set(Math.sin(t * 0.5) * 0.7);
-                ty.set(Math.sin(t * 0.37 + 1) * 0.3);
+            if (now - lastMove > 2500) {
+                const t = (now - t0) / 1000;
+                const nx = Math.sin(t * 0.5) * 0.7, ny = Math.sin(t * 0.37 + 1) * 0.3;
+                tx.set(nx); ty.set(ny);
+                signal.current.nx = nx; signal.current.ny = ny;
             }
             raf = requestAnimationFrame(tick);
         };
@@ -154,143 +188,223 @@ export function HeroAstronaut() {
             window.removeEventListener("pointermove", onMove);
             cancelAnimationFrame(raf);
         };
-    }, [tx, ty]);
+    }, [started, tx, ty]);
 
-    const choose = (opt: (typeof OPTIONS)[number]) => {
-        setLine(opt.reply);
-        if (enabled) speak(opt.reply);
-        setTimeout(() => {
-            if (opt.href.startsWith("#")) document.querySelector(opt.href)?.scrollIntoView({ behavior: "smooth" });
-            else window.open(opt.href, "_blank");
-        }, 1400);
-    };
-
-    const [mounted, setMounted] = useState(false);
-    useEffect(() => {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        setMounted(true);
+    const go = useCallback((href: string) => {
+        if (href.startsWith("#")) document.querySelector(href)?.scrollIntoView({ behavior: "smooth" });
+        else window.open(href, "_blank");
     }, []);
 
+    const choose = async (o: (typeof OPTIONS)[number]) => {
+        if (busy) return;
+        setBusy(true);
+        setPrev(cur);
+        await say(o.reply, o.src);
+        await sleep(250);
+        go(o.href);
+        setBusy(false);
+    };
+
+    const ask = async (q: string) => {
+        const question = q.trim();
+        if (!question || busy) return;
+        setBusy(true);
+        setDraft("");
+        setLog((l) => [...l, { role: "you", text: question }]);
+        await sleep(450);
+        setLog((l) => [...l, { role: "bot", text: answer(question) }]);
+        setBusy(false);
+    };
+
+    useEffect(() => {
+        logRef.current?.scrollTo({ top: logRef.current.scrollHeight, behavior: "smooth" });
+    }, [log]);
+
+    const copyEmail = async () => {
+        try {
+            await navigator.clipboard.writeText(SOCIAL.email);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 1800);
+        } catch {
+            window.location.href = `mailto:${SOCIAL.email}`;
+        }
+    };
+
     const gate = (
-            <AnimatePresence>
-                {!started && (
-                    <motion.div
-                        key="gate"
-                        className="fixed inset-0 z-[10000] flex flex-col items-center justify-center bg-black px-6 text-center"
-                        exit={{ opacity: 0, scale: 1.04 }}
-                        transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+        <AnimatePresence>
+            {!started && (
+                <motion.div
+                    key="gate"
+                    className="fixed inset-0 z-[10000] flex flex-col items-center justify-center bg-black px-6 text-center"
+                    exit={{ opacity: 0, filter: "blur(18px)", scale: 1.06 }}
+                    transition={{ duration: 1.1, ease }}
+                >
+                    <motion.p
+                        className="font-display text-[clamp(22px,4.2vw,46px)] font-extralight uppercase leading-[1.25] tracking-[0.14em] text-white"
+                        initial={{ opacity: 0, y: 14 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ letterSpacing: "0.5em", opacity: 0 }}
+                        transition={{ duration: 1.4, delay: 0.3 }}
                     >
-                        <motion.p
-                            className="font-display text-[clamp(22px,4.2vw,46px)] font-extralight uppercase leading-[1.25] tracking-[0.14em] text-white"
-                            initial={{ opacity: 0, y: 14 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 1.4, delay: 0.3 }}
-                        >
-                            You have arrived.
-                            <br />
-                            The prophecy is complete.
-                            <br />
-                            <span className="text-white/60">How can I serve?</span>
-                        </motion.p>
-                        <motion.button
-                            type="button"
-                            onClick={start}
-                            className="mt-12 rounded-full border border-white/40 px-8 py-3 font-display text-[12px] uppercase tracking-[0.35em] text-white transition-colors hover:bg-white hover:text-black focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ duration: 1, delay: 1.6 }}
-                        >
-                            Click to start
-                        </motion.button>
-                        <motion.span
-                            className="mt-4 font-jetbrains text-[10px] uppercase tracking-[0.25em] text-white/40"
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ delay: 2.2 }}
-                        >
-                            🔊 sound on
-                        </motion.span>
-                    </motion.div>
-                )}
-            </AnimatePresence>
+                        You have arrived.
+                        <br />
+                        The prophecy is complete.
+                        <br />
+                        <span className="text-white/60">How can I serve?</span>
+                    </motion.p>
+                    <motion.button
+                        type="button"
+                        onClick={begin}
+                        className="group relative mt-12 overflow-hidden rounded-full border border-white/40 px-9 py-3 font-display text-[12px] uppercase tracking-[0.35em] text-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ scale: 1.5, opacity: 0 }}
+                        transition={{ duration: 1, delay: 1.5 }}
+                        whileTap={{ scale: 0.96 }}
+                    >
+                        <span className="absolute inset-0 origin-left scale-x-0 bg-white transition-transform duration-500 ease-out group-hover:scale-x-100" />
+                        <span className="relative transition-colors duration-500 group-hover:text-black">Click to start</span>
+                    </motion.button>
+                    <motion.span className="mt-4 font-jetbrains text-[10px] uppercase tracking-[0.25em] text-white/40" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2.1 }}>
+                        sound on · move your cursor
+                    </motion.span>
+                </motion.div>
+            )}
+        </AnimatePresence>
     );
 
     return (
         <>
             {mounted && createPortal(gate, document.body)}
 
-            <section className="relative left-1/2 h-[100svh] min-h-[640px] w-screen -translate-x-1/2 overflow-hidden" aria-label="Intro">
+            <section className="relative left-1/2 min-h-[640px] w-screen -translate-x-1/2 overflow-hidden max-[899px]:h-[max(100svh,700px)] min-[900px]:h-[100svh]" aria-label="Intro">
                 <h1 className="sr-only">Suryash Raj — digital marketing, operations, customer success</h1>
 
-                {/* scene: cover-fitted photo, astronaut sits right of centre on wide screens */}
-                <div
-                    ref={sceneRef}
-                    className="absolute top-[37%] left-1/2 -translate-x-1/2 -translate-y-1/2 min-[900px]:left-[64%] min-[900px]:top-1/2"
-                    style={{
-                        width: "max(100vw, calc(100svh * 1.2414))",
-                        aspectRatio: "1080 / 870",
-                        maskImage: "radial-gradient(ellipse 62% 66% at 51% 46%, #000 55%, transparent 100%)",
-                        WebkitMaskImage: "radial-gradient(ellipse 62% 66% at 51% 46%, #000 55%, transparent 100%)",
-                    }}
+                {/* the figure */}
+                <motion.div
+                    className="absolute z-[2] w-[min(104vw,540px)] max-[899px]:left-1/2 max-[899px]:top-[7%] max-[899px]:-translate-x-1/2 min-[900px]:bottom-0 min-[900px]:right-[-3vw] min-[900px]:w-[min(58vw,118svh)]"
+                    initial={{ opacity: 0, scale: 1.1, filter: "blur(16px)" }}
+                    animate={started ? { opacity: 1, scale: 1, filter: "blur(0px)" } : {}}
+                    transition={{ duration: 1.6, ease }}
                 >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src="/astro/scene.jpg" alt="" className="absolute inset-0 h-full w-full select-none" draggable={false} />
+                    <div className="relative aspect-[668/613] w-full">
+                        <div
+                            className="pointer-events-none absolute -inset-[12%]"
+                            style={{ background: "radial-gradient(ellipse 48% 44% at 50% 38%, oklch(0.76 0.12 185 / 0.22), transparent 70%), radial-gradient(ellipse 40% 36% at 62% 52%, oklch(0.6 0.2 300 / 0.16), transparent 70%)" }}
+                        />
+                        <motion.img src="/helmet/body.webp" alt="" draggable={false} className="absolute inset-0 h-full w-full select-none" style={{ x: bodyX }} />
 
-                    {/* head: perspective tilt toward the cursor, pivoting at the collar */}
-                    <div className="absolute" style={{ left: "45.926%", top: "27.586%", width: "10.74%", height: "11.494%", perspective: 520 }}>
-                        <motion.div
-                            className="relative h-full w-full"
-                            style={{ rotateY: rotY, rotateX: rotX, x: moveX, transformOrigin: "50% 90%", transformStyle: "preserve-3d" }}
-                        >
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img src="/astro/helmet.png" alt="Astronaut" className="absolute inset-0 h-full w-full select-none" draggable={false} />
+                        <div ref={headRef} className="absolute" style={{ left: "16.467%", top: "0%", width: "67.365%", height: "67.21%", perspective: 760 }}>
                             <motion.div
-                                className="absolute"
-                                style={{ left: "18.1%", top: "22%", width: "63.8%", height: "68%", x: visorX, y: visorY }}
+                                className="relative h-full w-full"
+                                style={{ rotateY: rotY, rotateX: rotX, rotateZ: rotZ, x: headX, y: headY, transformOrigin: "50% 96.6%" }}
                             >
-                                <VisorGlitch />
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img src="/helmet/head.webp" alt="Astronaut helmet" draggable={false} className="absolute inset-0 h-full w-full select-none" />
+                                <div className="absolute inset-0 opacity-90" style={{ clipPath: "ellipse(35.56% 34.47% at 48.44% 50.24%)" }}>
+                                    <VisorCanvas signal={signal} active={started} />
+                                </div>
                             </motion.div>
-                        </motion.div>
+                        </div>
                     </div>
-                </div>
+                </motion.div>
 
-                {/* dark wash so text always reads */}
-                <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-bg-primary/80 via-bg-primary/20 to-transparent max-[899px]:bg-gradient-to-t max-[899px]:from-bg-primary/95 max-[899px]:via-bg-primary/30 max-[899px]:to-transparent" />
+                <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[3] h-40 bg-gradient-to-t from-bg-primary to-transparent" />
 
-                {/* assistant */}
-                <div className="absolute inset-x-6 bottom-[9%] z-10 max-w-[34rem] min-[900px]:inset-x-auto min-[900px]:bottom-auto min-[900px]:left-[7%] min-[900px]:top-1/2 min-[900px]:-translate-y-1/2">
-                    <p className="font-display text-[11px] font-light uppercase tracking-[0.3em] text-accent-primary">◉ Assistant · Suryash</p>
-                    <p className="mt-4 min-h-[7.5rem] font-display text-[clamp(20px,2.6vw,32px)] font-extralight leading-[1.3] tracking-[0.01em] text-text-primary" aria-live="polite">
-                        {started ? <Typewriter text={line} /> : null}
+                {/* the assistant */}
+                <motion.div
+                    className="glass absolute z-10 flex max-h-[58svh] flex-col min-[900px]:max-h-[80svh] overflow-hidden rounded-2xl p-5 max-[899px]:inset-x-4 max-[899px]:bottom-4 min-[900px]:left-[4.5vw] min-[900px]:top-1/2 min-[900px]:w-[min(36rem,42vw)] min-[900px]:-translate-y-1/2 min-[900px]:p-7"
+                    initial={{ opacity: 0, y: 24 }}
+                    animate={started ? { opacity: 1, y: 0 } : {}}
+                    transition={{ duration: 1.1, delay: 0.5, ease }}
+                >
+                    <p className="flex items-center gap-2 font-display text-[11px] font-normal uppercase tracking-[0.3em] text-accent-primary">
+                        <span className="relative flex size-2"><span className="absolute inline-flex size-full animate-ping rounded-full bg-accent-primary opacity-60" /><span className="relative inline-flex size-2 rounded-full bg-accent-primary" /></span>
+                        AI assistant · Suryash
                     </p>
-                    <div className="mt-6 flex min-h-[7rem] flex-wrap gap-2">
-                        <AnimatePresence>
-                            {showOptions &&
-                                OPTIONS.map((o, i) => (
-                                    <motion.button
-                                        key={o.label}
-                                        type="button"
-                                        onClick={() => choose(o)}
-                                        className="rounded-full border border-border-strong bg-bg-surface/70 px-4 py-2 font-display text-[13px] font-normal tracking-[0.03em] text-text-primary backdrop-blur-md transition-colors hover:border-accent-primary hover:bg-accent-primary hover:text-bg-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-primary"
-                                        initial={{ opacity: 0, y: 10 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        transition={{ delay: i * 0.1, duration: 0.5 }}
-                                    >
-                                        {o.label}
-                                    </motion.button>
-                                ))}
-                        </AnimatePresence>
-                    </div>
-                    {showOptions && (
-                        <p className="mt-3 font-jetbrains text-[11px] tracking-[0.08em] text-text-muted">
-                            or write: <a href={`mailto:${SOCIAL.email}`} className="text-text-secondary underline decoration-border-strong underline-offset-4 hover:text-accent-primary">{SOCIAL.email}</a>
-                        </p>
-                    )}
-                </div>
 
-                <div className="pointer-events-none absolute inset-x-0 bottom-[3%] z-10 flex justify-center font-jetbrains text-[9px] uppercase tracking-[0.3em] text-text-muted max-[899px]:hidden">
-                    Scroll
-                </div>
+                    <div className="mt-4 min-h-0 flex-1 overflow-y-auto pr-1 [scrollbar-width:none]" ref={logRef}>
+                        {prev && (
+                            <p className="font-display text-[clamp(15px,1.45vw,20px)] font-light leading-snug text-text-primary/45 blur-[3px] transition-all duration-700" aria-hidden="true">
+                                {prev}
+                            </p>
+                        )}
+                        <p className="mt-3 font-display text-[clamp(19px,2.2vw,31px)] font-extralight leading-[1.25] tracking-[0.005em] text-text-primary" aria-live="polite">
+                            {started && cur ? <Typewriter text={cur} onDone={() => typingDone.current?.()} /> : null}
+                        </p>
+
+                        {log.length > 0 && (
+                            <div className="mt-5 flex flex-col gap-2.5 border-t border-white/10 pt-4">
+                                {log.map((m, i) => (
+                                    <div key={i} className={m.role === "you" ? "self-end rounded-2xl rounded-br-sm bg-accent-primary/90 px-3.5 py-2 font-space text-[14px] text-bg-primary" : "self-start rounded-2xl rounded-bl-sm border border-white/12 bg-white/5 px-3.5 py-2 font-space text-[14px] leading-relaxed text-text-primary"}>
+                                        {m.role === "bot" && i === log.length - 1 ? <Typewriter text={m.text} caret={false} /> : m.text}
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+
+                    <AnimatePresence>
+                        {showOptions && (
+                            <motion.div className="mt-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.6 }}>
+                                <div className="flex flex-wrap gap-2">
+                                    {OPTIONS.map((o, i) => (
+                                        <motion.button
+                                            key={o.label}
+                                            type="button"
+                                            disabled={busy}
+                                            onClick={() => choose(o)}
+                                            className="rounded-full border border-white/25 bg-white/90 px-4 py-2 font-display text-[13.5px] font-medium tracking-[0.01em] text-black transition-colors hover:bg-accent-primary disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-primary"
+                                            initial={{ opacity: 0, y: 10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            transition={{ delay: i * 0.09, duration: 0.5, ease }}
+                                            whileTap={{ scale: 0.95 }}
+                                        >
+                                            {o.label}
+                                        </motion.button>
+                                    ))}
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={copyEmail}
+                                    className="mt-2.5 inline-flex max-w-full items-center gap-2 rounded-full border border-white/20 bg-white/5 px-4 py-2 font-display text-[13px] text-text-secondary transition-colors hover:border-white/40 hover:text-text-primary"
+                                    aria-label="Copy email address"
+                                >
+                                    <span className="truncate">Write me: <span className="underline underline-offset-2">{SOCIAL.email}</span></span>
+                                    <span className="font-jetbrains text-[10px] uppercase tracking-widest text-accent-primary">{copied ? "copied" : "copy"}</span>
+                                </button>
+
+                                <form
+                                    onSubmit={(e) => {
+                                        e.preventDefault();
+                                        void ask(draft);
+                                    }}
+                                    className="mt-3 flex items-center gap-2 rounded-full border border-white/20 bg-black/30 p-1 pl-4 focus-within:border-accent-primary"
+                                >
+                                    <input
+                                        value={draft}
+                                        onChange={(e) => setDraft(e.target.value)}
+                                        placeholder="Ask me anything about Suryash…"
+                                        aria-label="Ask the assistant"
+                                        className="min-w-0 flex-1 bg-transparent font-space text-[14px] text-text-primary outline-none placeholder:text-text-muted"
+                                    />
+                                    <button type="submit" disabled={busy || !draft.trim()} className="rounded-full bg-accent-primary px-4 py-1.5 font-display text-[12px] font-medium uppercase tracking-widest text-bg-primary transition-opacity disabled:opacity-40">
+                                        Send
+                                    </button>
+                                </form>
+                                {log.length === 0 && (
+                                    <div className="mt-2 flex flex-wrap gap-1.5 max-[899px]:hidden">
+                                        {SUGGESTIONS.map((s) => (
+                                            <button key={s} type="button" onClick={() => void ask(s)} className="rounded-full border border-white/12 px-3 py-1 font-space text-[12px] text-text-muted transition-colors hover:border-white/30 hover:text-text-primary">
+                                                {s}
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+                </motion.div>
             </section>
         </>
     );

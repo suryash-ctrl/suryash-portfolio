@@ -7,8 +7,6 @@ import { MotionPreferenceProvider } from "@/components/layout/motion-preference"
 import { SoundProvider } from "@/components/layout/sound";
 import { ParallaxProvider } from "@/components/layout/parallax";
 import { Navbar } from "@/components/layout/navbar";
-import { ThemeKeys } from "@/components/layout/theme-keys";
-import { ThemePicker } from "@/components/ui/theme-picker";
 import { CursorTrail } from "@/components/ui/cursor-trail";
 import { SpaceAudio } from "@/components/ui/space-audio";
 import { SoundToggle } from "@/components/ui/sound-toggle";
@@ -74,7 +72,7 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html lang="en" className={`${spaceGrotesk.variable} ${jetbrainsMono.variable} ${display.variable}`} suppressHydrationWarning>
+        <html lang="en" className={`dark ${spaceGrotesk.variable} ${jetbrainsMono.variable} ${display.variable}`} suppressHydrationWarning>
             <body className="flex min-h-screen flex-col" suppressHydrationWarning>
                 <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
                 <ThemeProvider>
@@ -91,10 +89,8 @@ export default function RootLayout({
                                 <ParticleField />
                                 <SpaceAudio />
                                 <Navbar />
-                                <ThemeKeys />
                                 <CursorTrail />
                                 <div id="main" className="relative z-10 flex-1">{children}</div>
-                                <ThemePicker />
                                 <SoundToggle />
                                 <ScrollRuler />
                             </ParallaxProvider>

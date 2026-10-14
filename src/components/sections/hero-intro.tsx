@@ -33,7 +33,7 @@ export function HeroIntro() {
                         <span className="text-text-primary underline decoration-border-strong underline-offset-2">marketing and finance</span>, I bring an
                         operator&apos;s eye to acquisition, reporting, account health, and the systems that keep
                         teams moving together. Experience across{" "}
-                        <span className="text-text-primary underline decoration-border-strong underline-offset-2">UPS Global Business Services</span>,{" "}
+                        <span className="text-text-primary underline decoration-border-strong underline-offset-2">United Parcel Service (Global Business Solution, Pune 1)</span>,{" "}
                         <span className="text-text-primary underline decoration-border-strong underline-offset-2">NoBroker Interiors</span>, and{" "}
                         <span className="text-text-primary underline decoration-border-strong underline-offset-2">Botmatic Solutions</span>.
                     </p>
