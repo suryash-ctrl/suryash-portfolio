@@ -10,19 +10,22 @@ interface SpaceModeValue {
     toggle: () => void;
 }
 
-const SpaceModeContext = createContext<SpaceModeValue>({ enabled: false, toggle: () => {} });
+const SpaceModeContext = createContext<SpaceModeValue>({ enabled: true, toggle: () => {} });
 
 export function SpaceModeProvider({ children }: { children: React.ReactNode }) {
-    const [enabled, setEnabled] = useState(false);
+    // On by default — the immersive space theme is the first-load experience.
+    // A visitor who explicitly turns it off (toggle persists "off") gets the
+    // plain professional view back on their next visit.
+    const [enabled, setEnabled] = useState(true);
     const { theme, setTheme } = useTheme();
     const priorThemeRef = useRef<string | undefined>(undefined);
 
     useEffect(() => {
         try {
             const saved = localStorage.getItem(STORAGE_KEY);
-            if (saved === "on") setEnabled(true);
+            if (saved === "off") setEnabled(false);
         } catch {
-            // ignore: default to off
+            // ignore: default to on
         }
     }, []);
 

@@ -5,8 +5,11 @@ import { useSpaceMode } from "@/components/layout/space-mode";
 
 /** Procedurally synthesized deep-space drone — no external audio file.
  *  Detuned sub-oscillators beating against each other, a slow filter sweep,
- *  and a quiet filtered-noise layer for texture. Starts only from the space
- *  mode toggle itself, which is the user gesture browsers require anyway. */
+ *  and a quiet filtered-noise layer for texture. Space mode is on by
+ *  default now, so the AudioContext is created on mount rather than from a
+ *  click — browsers still won't let it actually produce sound until a user
+ *  gesture happens, so it starts suspended and resumes on the visitor's
+ *  first click/key/touch/scroll, whichever comes first. */
 export function SpaceAudio() {
     const { enabled } = useSpaceMode();
     const ctxRef = useRef<AudioContext | null>(null);
@@ -79,6 +82,20 @@ export function SpaceAudio() {
         for (const { osc } of oscillators) osc.start(now);
         lfo.start(now);
         noise.start(now);
+
+        // Autoplay policy: the context starts suspended until a real user
+        // gesture. Resume on the first one, then stop listening.
+        const GESTURE_EVENTS = ["pointerdown", "keydown", "touchstart", "wheel"] as const;
+        let resumed = ctx.state !== "suspended";
+        const resume = () => {
+            if (resumed) return;
+            resumed = true;
+            ctx.resume().catch(() => {});
+            for (const ev of GESTURE_EVENTS) window.removeEventListener(ev, resume);
+        };
+        if (!resumed) {
+            for (const ev of GESTURE_EVENTS) window.addEventListener(ev, resume, { once: true, passive: true });
+        }
 
         stopFnRef.current = () => {
             const t = ctx.currentTime;
