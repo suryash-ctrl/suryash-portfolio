@@ -88,7 +88,7 @@ export function HeroAstronaut() {
     const [log, setLog] = useState<Msg[]>([]);
     const [draft, setDraft] = useState("");
     const logRef = useRef<HTMLDivElement>(null);
-    const headRef = useRef<HTMLDivElement>(null);
+    const figRef = useRef<HTMLDivElement>(null);
     const typingDone = useRef<(() => void) | null>(null);
     const alive = useRef(true);
     const signal = useRef<VisorSignal>({ nx: 0, ny: 0, dist: 0 });
@@ -147,12 +147,9 @@ export function HeroAstronaut() {
     const ty = useMotionValue(0);
     const sx = useSpring(tx, { stiffness: 85, damping: 15, mass: 0.7 });
     const sy = useSpring(ty, { stiffness: 85, damping: 15, mass: 0.7 });
-    const rotY = useTransform(sx, [-1, 1], [-26, 26]);
-    const rotX = useTransform(sy, [-1, 1], [13, -13]);
-    const rotZ = useTransform(sx, [-1, 1], [-3, 3]);
-    const headX = useTransform(sx, [-1, 1], ["-3%", "3%"]);
-    const headY = useTransform(sy, [-1, 1], ["-1.5%", "1.5%"]);
-    const bodyX = useTransform(sx, [-1, 1], ["0.8%", "-0.8%"]);
+    // the whole figure drifts a few pixels against the cursor, like it floats in depth
+    const floatX = useTransform(sx, [-1, 1], [10, -10]);
+    const floatY = useTransform(sy, [-1, 1], [6, -6]);
 
     useEffect(() => {
         if (!started) return;
@@ -160,12 +157,24 @@ export function HeroAstronaut() {
         let lastPt: [number, number] | null = null;
         let raf = 0;
         const t0 = performance.now();
-        const onMove = (e: PointerEvent) => {
-            lastMove = performance.now();
-            const el = headRef.current;
+        // a soft light follows the cursor across the helmet and shoulders (CSS vars, no re-render)
+        const setSpot = (clientX: number, clientY: number) => {
+            const el = figRef.current;
             if (!el) return;
             const r = el.getBoundingClientRect();
-            const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+            const bx = clientX - r.left, by = clientY - r.top;
+            el.style.setProperty("--bx", `${bx}px`);
+            el.style.setProperty("--by", `${by}px`);
+            el.style.setProperty("--hx", `${bx - r.width * 0.16467}px`);
+            el.style.setProperty("--hy", `${by}px`);
+        };
+        const onMove = (e: PointerEvent) => {
+            lastMove = performance.now();
+            const el = figRef.current;
+            if (!el) return;
+            setSpot(e.clientX, e.clientY);
+            const r = el.getBoundingClientRect();
+            const cx = r.left + r.width / 2, cy = r.top + r.height * 0.3;
             const nx = Math.max(-1, Math.min(1, (e.clientX - cx) / (window.innerWidth * 0.5)));
             const ny = Math.max(-1, Math.min(1, (e.clientY - cy) / (window.innerHeight * 0.5)));
             tx.set(nx); ty.set(ny);
@@ -179,6 +188,8 @@ export function HeroAstronaut() {
                 const nx = Math.sin(t * 0.5) * 0.7, ny = Math.sin(t * 0.37 + 1) * 0.3;
                 tx.set(nx); ty.set(ny);
                 signal.current.nx = nx; signal.current.ny = ny;
+                const r = figRef.current?.getBoundingClientRect();
+                if (r) setSpot(r.left + r.width * (0.5 + nx * 0.28), r.top + r.height * (0.32 + ny * 0.25));
             }
             raf = requestAnimationFrame(tick);
         };
@@ -287,26 +298,24 @@ export function HeroAstronaut() {
                     animate={started ? { opacity: 1, scale: 1, filter: "blur(0px)" } : {}}
                     transition={{ duration: 1.6, ease }}
                 >
-                    <div className="relative aspect-[668/613] w-full">
+                    <motion.div ref={figRef} className="relative aspect-[668/613] w-full" style={{ x: floatX, y: floatY }}>
                         <div
                             className="pointer-events-none absolute -inset-[12%]"
                             style={{ background: "radial-gradient(ellipse 48% 44% at 50% 38%, oklch(0.76 0.12 185 / 0.22), transparent 70%), radial-gradient(ellipse 40% 36% at 62% 52%, oklch(0.6 0.2 300 / 0.16), transparent 70%)" }}
                         />
-                        <motion.img src="/helmet/body.webp" alt="" draggable={false} className="absolute inset-0 h-full w-full select-none" style={{ x: bodyX }} />
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src="/helmet/body.webp" alt="" draggable={false} className="absolute inset-0 h-full w-full select-none" />
+                        <div className="spot" style={{ maskImage: "url(/helmet/body.webp)", WebkitMaskImage: "url(/helmet/body.webp)", backgroundImage: "radial-gradient(circle 230px at var(--bx, -999px) var(--by, -999px), rgba(150,255,240,0.95), transparent 72%)" }} />
 
-                        <div ref={headRef} className="absolute" style={{ left: "16.467%", top: "0%", width: "67.365%", height: "67.21%", perspective: 760 }}>
-                            <motion.div
-                                className="relative h-full w-full"
-                                style={{ rotateY: rotY, rotateX: rotX, rotateZ: rotZ, x: headX, y: headY, transformOrigin: "50% 96.6%" }}
-                            >
-                                {/* eslint-disable-next-line @next/next/no-img-element */}
-                                <img src="/helmet/head.webp" alt="Astronaut helmet" draggable={false} className="absolute inset-0 h-full w-full select-none" />
-                                <div className="absolute inset-0 opacity-90" style={{ clipPath: "ellipse(35.56% 34.47% at 48.44% 50.24%)" }}>
-                                    <VisorCanvas signal={signal} active={started} />
-                                </div>
-                            </motion.div>
+                        <div className="absolute" style={{ left: "16.467%", top: "0%", width: "67.365%", height: "67.21%" }}>
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img src="/helmet/head.webp" alt="Astronaut helmet" draggable={false} className="absolute inset-0 h-full w-full select-none" />
+                            <div className="absolute inset-0 opacity-90" style={{ clipPath: "ellipse(35.56% 34.47% at 48.44% 50.24%)" }}>
+                                <VisorCanvas signal={signal} active={started} />
+                            </div>
+                            <div className="spot" style={{ maskImage: "url(/helmet/head.webp)", WebkitMaskImage: "url(/helmet/head.webp)", backgroundImage: "radial-gradient(circle 230px at var(--hx, -999px) var(--hy, -999px), rgba(150,255,240,0.95), transparent 72%)" }} />
                         </div>
-                    </div>
+                    </motion.div>
                 </motion.div>
 
                 <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[3] h-40 bg-gradient-to-t from-bg-primary to-transparent" />
