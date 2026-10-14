@@ -4,10 +4,15 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { spaceGrotesk, jetbrainsMono, micro5 } from "@/lib/fonts";
 import { ThemeProvider } from "@/components/layout/theme-provider";
 import { MotionPreferenceProvider } from "@/components/layout/motion-preference";
+import { SpaceModeProvider } from "@/components/layout/space-mode";
 import { Navbar } from "@/components/layout/navbar";
 import { ThemeKeys } from "@/components/layout/theme-keys";
 import { ThemePicker } from "@/components/ui/theme-picker";
 import { CursorTrail } from "@/components/ui/cursor-trail";
+import { Starfield } from "@/components/ui/starfield";
+import { Astronaut } from "@/components/ui/astronaut";
+import { SpaceAudio } from "@/components/ui/space-audio";
+import { SpaceToggle } from "@/components/ui/space-toggle";
 import { SITE } from "@/config/site";
 import "./globals.css";
 
@@ -72,17 +77,27 @@ export default function RootLayout({
                 <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
                 <ThemeProvider>
                     <MotionPreferenceProvider>
-                        <a
-                            href="#main"
-                            className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-2 focus:z-60 focus:rounded focus:bg-accent-primary focus:px-3 focus:py-1.5 focus:font-space focus:text-[14px] focus:text-bg-primary"
-                        >
-                            skip → main
-                        </a>
-                        <Navbar />
-                        <ThemeKeys />
-                        <CursorTrail />
-                        <div id="main" className="flex-1">{children}</div>
-                        <ThemePicker />
+                        <SpaceModeProvider>
+                            <a
+                                href="#main"
+                                className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-2 focus:z-60 focus:rounded focus:bg-accent-primary focus:px-3 focus:py-1.5 focus:font-space focus:text-[14px] focus:text-bg-primary"
+                            >
+                                skip → main
+                            </a>
+                            <Starfield />
+                            <Astronaut />
+                            <SpaceAudio />
+                            <Navbar />
+                            <ThemeKeys />
+                            <CursorTrail />
+                            {/* relative + z-10: without its own stacking context, this
+                                in-flow content paints BEHIND the fixed starfield canvas
+                                (z-index:0 or not, a fixed element always paints after
+                                plain static content in the same stacking context) */}
+                            <div id="main" className="relative z-10 flex-1">{children}</div>
+                            <ThemePicker />
+                            <SpaceToggle />
+                        </SpaceModeProvider>
                     </MotionPreferenceProvider>
                 </ThemeProvider>
                 <Analytics />
