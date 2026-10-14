@@ -11,6 +11,9 @@ import { ThemePicker } from "@/components/ui/theme-picker";
 import { CursorTrail } from "@/components/ui/cursor-trail";
 import { Starfield } from "@/components/ui/starfield";
 import { Astronaut } from "@/components/ui/astronaut";
+import { Planets } from "@/components/ui/planets";
+import { BlackHole } from "@/components/ui/black-hole";
+import { Asteroids } from "@/components/ui/asteroids";
 import { SpaceAudio } from "@/components/ui/space-audio";
 import { SpaceToggle } from "@/components/ui/space-toggle";
 import { SITE } from "@/config/site";
@@ -85,6 +88,9 @@ export default function RootLayout({
                                 skip → main
                             </a>
                             <Starfield />
+                            <BlackHole />
+                            <Planets />
+                            <Asteroids />
                             <Astronaut />
                             <SpaceAudio />
                             <Navbar />

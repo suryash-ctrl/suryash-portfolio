@@ -15,6 +15,7 @@ import {
     type Shockwave,
 } from "@/lib/particle-system";
 import { useIsMobile } from "@/lib/use-is-mobile";
+import { useSpaceMode } from "@/components/layout/space-mode";
 
 interface DitherImageProps {
     src: string;
@@ -87,6 +88,7 @@ export function DitherImage({
     const runningRef = useRef(false);
     const isMobile = useIsMobile();
     const { resolvedTheme } = useTheme();
+    const { enabled: spaceMode } = useSpaceMode();
 
     /* The render loop and the resize handler are long-lived closures built
        once, so they cannot see a later render's value; the current dot colour
@@ -96,10 +98,15 @@ export function DitherImage({
        order, so the mirror is current by the time they run. */
     const dotColorRef = useRef({ r: 232, g: 225, b: 215 });
     useEffect(() => {
-        dotColorRef.current = resolvedTheme === "light"
+        // Space mode forces dark mode anyway, but the warm off-white tuned
+        // for a plain dark slate background reads as a flat cream sticker
+        // against a starfield — a cool starlight tint belongs there instead.
+        dotColorRef.current = spaceMode
+            ? { r: 222, g: 232, b: 248 }  // cool starlight blue-white
+            : resolvedTheme === "light"
             ? { r: 50, g: 42, b: 32 }     // #322a20 — warm dark brown
             : { r: 232, g: 225, b: 215 };  // #e8e1d7 — warm off-white
-    }, [resolvedTheme]);
+    }, [resolvedTheme, spaceMode]);
 
     const startLoop = useCallback(() => {
         if (runningRef.current) return;
@@ -313,7 +320,7 @@ export function DitherImage({
         const rect = canvas.getBoundingClientRect();
         const dpr = window.devicePixelRatio || 1;
         renderDots(ctx, sys, CONFIG.invert, rect.width, rect.height, dpr, dotColorRef.current);
-    }, [resolvedTheme]);
+    }, [resolvedTheme, spaceMode]);
 
     return (
         <canvas
