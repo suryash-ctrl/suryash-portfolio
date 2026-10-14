@@ -90,6 +90,14 @@ export function SpaceAudio() {
             master.gain.cancelScheduledValues(t);
             master.gain.setValueAtTime(master.gain.value, t);
             master.gain.linearRampToValueAtTime(0.5, t + 3);
+            // warp-in: filter opens from a muffled rumble while the noise bed swells and settles
+            filter.frequency.cancelScheduledValues(t);
+            filter.frequency.setValueAtTime(120, t);
+            filter.frequency.exponentialRampToValueAtTime(1400, t + 5);
+            airGain.gain.cancelScheduledValues(t);
+            airGain.gain.setValueAtTime(0.0, t);
+            airGain.gain.linearRampToValueAtTime(0.05, t + 2);
+            airGain.gain.linearRampToValueAtTime(0.012, t + 6);
         };
 
         let unlocked = false;

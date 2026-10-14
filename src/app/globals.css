@@ -302,3 +302,21 @@ body {
     font-weight: 300;
     letter-spacing: 0.03em;
 }
+
+/* Visor glitch: content flickers, tears sideways, and slices on each swap. */
+@keyframes visor-flicker { 0%,100% { opacity: .95 } 45% { opacity: .75 } 50% { opacity: 1 } 55% { opacity: .6 } }
+@keyframes visor-tear {
+    0% { transform: translate(0,0) skew(0); clip-path: inset(0 0 0 0) }
+    20% { transform: translate(-6px,1px) skew(-8deg); clip-path: inset(10% 0 55% 0) }
+    40% { transform: translate(7px,-1px) skew(6deg); clip-path: inset(55% 0 8% 0) }
+    60% { transform: translate(-3px,0) skew(0); clip-path: inset(0 0 0 0) }
+    100% { transform: translate(0,0); clip-path: inset(0 0 0 0) }
+}
+@keyframes visor-scan { from { background-position: 0 0 } to { background-position: 0 6px } }
+.visor-idle { animation: visor-flicker 1.2s steps(6) infinite }
+.visor-burst { animation: visor-tear .14s steps(4) 1 }
+.visor-scan {
+    background: repeating-linear-gradient(to bottom, transparent 0 2px, oklch(0.8 0.1 185 / 0.14) 2px 3px);
+    animation: visor-scan .4s linear infinite; mix-blend-mode: screen;
+}
+@media (prefers-reduced-motion: reduce) { .visor-idle, .visor-burst, .visor-scan { animation: none } }

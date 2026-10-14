@@ -141,7 +141,7 @@ export function ParticleField() {
             const R = heroR + (sideR - heroR) * ease(heroOut);
             const cx = w / 2 + (wide ? w * 0.3 : 0) * ease(heroOut);
             const cy = h / 2;
-            const baseAlpha = 1 - (wide ? 0.5 : 0.72) * ease(heroOut);
+            const baseAlpha = (1 - (wide ? 0.5 : 0.72) * ease(heroOut)) * clamp((window.scrollY / h - 0.25) / 0.6, 0, 1);
 
             // rotation: idle spin + scroll-linked turn, eased tilt toward the cursor
             tilt.x += (pointer.ny * 0.35 - tilt.x) * 0.06;
