@@ -1,0 +1,295 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ============================================
+   DESIGN SYSTEM TOKENS — Suryash Raj
+   ============================================ */
+
+html {
+    scroll-behavior: smooth;
+}
+
+:root {
+    /* FONTS — values set by next/font classes on <html>, fallbacks only */
+    /* SPACING (4px grid) */
+    --spacing-1: 4px;
+    --spacing-2: 8px;
+    --spacing-3: 12px;
+    --spacing-4: 16px;
+    --spacing-5: 20px;
+    --spacing-6: 24px;
+    --spacing-8: 32px;
+    --spacing-10: 40px;
+    --spacing-12: 48px;
+    --spacing-16: 64px;
+    --spacing-20: 80px;
+    --spacing-24: 96px;
+    --spacing-32: 128px;
+
+    /* RADIUS */
+    --radius-sm: 4px;
+    --radius-md: 6px;
+    --radius-lg: 8px;
+    --radius-xl: 12px;
+    --radius-full: 9999px;
+
+    /* TIMING */
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+    --dur-fast: 100ms;
+    --dur-normal: 200ms;
+    --dur-slow: 500ms;
+
+    /* LIGHT THEME ACCENTS */
+    --accent-primary: oklch(0.5 0.15 215);
+    --accent-primary-hover: oklch(0.44 0.14 215);
+    --accent-primary-muted: oklch(0.5 0.15 215 / 0.08);
+    --accent-secondary: oklch(0.5 0.098 170);
+    --accent-tertiary: oklch(0.47 0.098 40);
+    --pixel-orange: oklch(0.53 0.17 215);
+    --status-error: oklch(0.52 0.15 25);
+    --status-warning: oklch(0.68 0.13 85);
+
+    /* LIGHT THEME (default — "Ledger") */
+    --bg-primary: oklch(0.975 0.008 235);
+    --bg-secondary: oklch(0.945 0.011 235);
+    --bg-tertiary: oklch(0.915 0.014 235);
+    --bg-surface: oklch(0.99 0.005 235);
+    --text-primary: oklch(0.15 0.008 235);
+    --text-secondary: oklch(0.38 0.013 235);
+    --text-tertiary: oklch(0.46 0.01 235);
+    --text-muted: oklch(0.505 0.008 235);
+    --border-default: oklch(0.915 0.014 235);
+    --border-subtle: oklch(0.945 0.011 235);
+    --border-strong: oklch(0.84 0.018 235);
+}
+
+/* ============================================
+   DARK THEME (overrides :root when .dark is on <html>)
+   ============================================ */
+.dark {
+    --bg-primary: oklch(0.1 0.006 235);
+    --bg-secondary: oklch(0.15 0.008 235);
+    --bg-tertiary: oklch(0.2 0.01 235);
+    --bg-surface: oklch(0.25 0.01 235);
+    --text-primary: oklch(0.96 0.006 235);
+    --text-secondary: oklch(0.72 0.01 235);
+    --text-tertiary: oklch(0.66 0.008 235);
+    --text-muted: oklch(0.6 0.006 235);
+    --border-default: oklch(0.25 0.01 235);
+    --border-subtle: oklch(0.18 0.008 235);
+    --border-strong: oklch(0.32 0.011 235);
+
+    /* Accents — brighter in dark mode for contrast */
+    --accent-primary: oklch(0.62 0.16 215);
+    --accent-primary-hover: oklch(0.56 0.15 215);
+    --accent-primary-muted: oklch(0.62 0.16 215 / 0.08);
+    --accent-secondary: oklch(0.62 0.098 170);
+    --accent-tertiary: oklch(0.6 0.098 40);
+    --pixel-orange: oklch(0.64 0.17 215);
+    --status-error: oklch(0.6 0.15 25);
+    --status-warning: oklch(0.72 0.14 85);
+}
+
+/* ============================================
+   TAILWIND v4 THEME MAPPING
+   ============================================ */
+@theme inline {
+    /* Fonts */
+    --font-space: var(--font-space);
+    --font-jetbrains: var(--font-jetbrains);
+    --font-micro: var(--font-micro);
+
+    /* Background colors */
+    --color-bg-primary: var(--bg-primary);
+    --color-bg-secondary: var(--bg-secondary);
+    --color-bg-tertiary: var(--bg-tertiary);
+    --color-bg-surface: var(--bg-surface);
+
+    /* Text colors */
+    --color-text-primary: var(--text-primary);
+    --color-text-secondary: var(--text-secondary);
+    --color-text-tertiary: var(--text-tertiary);
+    --color-text-muted: var(--text-muted);
+
+    /* Border colors */
+    --color-border-default: var(--border-default);
+    --color-border-subtle: var(--border-subtle);
+    --color-border-strong: var(--border-strong);
+
+    /* Accent colors */
+    --color-accent-primary: var(--accent-primary);
+    --color-accent-primary-hover: var(--accent-primary-hover);
+    --color-accent-primary-muted: var(--accent-primary-muted);
+    --color-accent-secondary: var(--accent-secondary);
+    --color-accent-tertiary: var(--accent-tertiary);
+    --color-pixel-orange: var(--pixel-orange);
+    --color-status-error: var(--status-error);
+    --color-status-warning: var(--status-warning);
+}
+
+/* ============================================
+   BASE STYLES
+   ============================================ */
+body {
+    background: var(--bg-primary);
+    color: var(--text-secondary);
+    font-family: var(--font-space);
+    overflow-x: hidden;
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+@keyframes cursor-blink {
+    0%,
+    50% {
+        opacity: 1;
+    }
+    51%,
+    100% {
+        opacity: 0;
+    }
+}
+
+@keyframes border-pulse {
+    0%,
+    100% {
+        border-color: var(--accent-primary);
+    }
+    50% {
+        border-color: var(--accent-primary-hover);
+        box-shadow: 0 0 8px color-mix(in oklch, var(--accent-primary) 15%, transparent);
+    }
+}
+
+@keyframes avatar-float {
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-6px);
+    }
+}
+
+@keyframes status-pulse {
+    0%,
+    100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+/* ============================================
+   MARQUEE
+   ============================================ */
+@keyframes marquee {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(-50%);
+    }
+}
+
+.marquee {
+    animation: marquee 35s linear infinite;
+}
+.marquee:hover {
+    animation-play-state: paused;
+}
+
+@keyframes scan-once {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+.animate-scan-once {
+    animation: scan-once 0.6s ease-out forwards;
+}
+
+.marquee-mask {
+    -webkit-mask-image: linear-gradient(to right, transparent, black 60px, black calc(100% - 60px), transparent);
+    mask-image: linear-gradient(to right, transparent, black 60px, black calc(100% - 60px), transparent);
+}
+
+/* ============================================
+   UTILITIES
+   ============================================ */
+.scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}
+
+.dot-grid-overlay {
+    background-image: radial-gradient(circle, var(--accent-primary) 1px, transparent 1px);
+    background-size: 10px 10px;
+    opacity: 0;
+}
+.group:hover .dot-grid-overlay {
+    opacity: 0.05;
+}
+
+/* ============================================
+   FOCUS RING
+
+   One rule for the whole app. Anything focusable that does not opt out
+   gets this; without it the browser falls back to its own blue outline,
+   which belongs to no theme here.
+
+   Deliberately unlayered. Tailwind's utilities live in @layer utilities,
+   and unlayered rules beat every layer regardless of source order, so
+   this wins over a stray `outline-none` rather than losing to it.
+
+   The colour is mixed from --accent-primary rather than hardcoded, so it
+   tracks all eight palettes and both modes with no per-theme entries. The
+   softer alpha is what keeps a 3px ring from reading as an error state.
+   ============================================ */
+/* Longhands, not the `outline` shorthand. The build emits a no-color-mix
+   fallback copy of any shorthand it sees, and that copy carries no colour,
+   so on most elements the ring silently fell back to currentColor and came
+   out grey or green depending on the text it sat next to. Setting
+   outline-color on its own leaves nothing for the fallback to reset. */
+:focus-visible {
+    outline-width: 3px;
+    outline-style: solid;
+    outline-color: color-mix(in oklab, var(--accent-primary) 55%, transparent);
+    outline-offset: 2px;
+}
+
+/* Pointer users never see it; only keyboard focus does. */
+:focus:not(:focus-visible) {
+    outline: none;
+}
+
+/* Windows high contrast: the mixed colour is dropped there, so name a
+   system colour explicitly instead of inheriting a transparent ring. */
+@media (forced-colors: active) {
+    :focus-visible {
+        outline-color: Highlight;
+    }
+}
+
+/* ============================================
+   REDUCED MOTION
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
