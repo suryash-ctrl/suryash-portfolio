@@ -387,10 +387,3 @@ body {
 .blob-b { animation: blob-drift-b 32s ease-in-out infinite }
 @media (prefers-reduced-motion: reduce) { .blob-a, .blob-b { animation: none } }
 
-/* Cursor light on the figure: a soft glow clipped to the figure's own alpha. */
-.spot {
-    position: absolute; inset: 0; pointer-events: none;
-    mask-size: 100% 100%; -webkit-mask-size: 100% 100%;
-    mask-repeat: no-repeat; -webkit-mask-repeat: no-repeat;
-    mix-blend-mode: overlay;
-}

@@ -136,12 +136,12 @@ export function ParticleField() {
 
             // placement: centred in the hero, then off to the side (wide screens)
             const wide = w >= 1100;
-            const heroR = Math.min(w, h) * (w < 900 ? 0.15 : 0.155);
+            const heroR = Math.min(w, h) * (w < 900 ? 0.2 : 0.3);
             const sideR = Math.min(w, h) * (wide ? 0.3 : 0.34);
             const R = heroR + (sideR - heroR) * ease(heroOut);
-            const cx = w / 2 + (wide ? w * 0.3 : 0) * ease(heroOut);
-            const cy = h / 2;
-            const baseAlpha = (1 - (wide ? 0.5 : 0.72) * ease(heroOut)) * clamp((window.scrollY / h - 0.25) / 0.6, 0, 1);
+            const cx = w / 2 + (wide ? w * 0.2 : 0) + (wide ? w * 0.1 : 0) * ease(heroOut);
+            const cy = h * (w < 900 ? 0.3 : 0.45) + h * 0.2 * ease(heroOut);
+            const baseAlpha = (1 - (wide ? 0.5 : 0.72) * ease(heroOut));
 
             // rotation: idle spin + scroll-linked turn, eased tilt toward the cursor
             tilt.x += (pointer.ny * 0.35 - tilt.x) * 0.06;
