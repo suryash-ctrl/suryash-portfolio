@@ -2,10 +2,13 @@
 
 import { motion } from "framer-motion";
 import { useSpaceMode } from "@/components/layout/space-mode";
+import { useSpaceTime } from "@/components/layout/space-time";
 import { useMotionPreference } from "@/components/layout/motion-preference";
+import { useParallax } from "@/components/layout/parallax";
 
 /** A slowly counter-rotating pair of triangles behind the astronaut — a
- *  quiet sacred-geometry echo, glowing in the site's own accent colour. */
+ *  quiet sacred-geometry echo, glowing in the site's own accent colour.
+ *  Night only — it reads as a cosmic motif, not a daylight one. */
 function GeometryHalo() {
     return (
         <motion.svg
@@ -85,33 +88,57 @@ function AstronautSvg() {
     );
 }
 
+function NightAstronaut() {
+    const parallax = useParallax(16);
+    return (
+        <motion.div aria-hidden="true" className="pointer-events-none fixed top-0 left-0 z-40" style={{ x: parallax.x, y: parallax.y }}>
+            <motion.div
+                animate={{
+                    x: ["6vw", "68vw", "40vw", "82vw", "6vw"],
+                    y: ["12vh", "32vh", "62vh", "22vh", "12vh"],
+                    rotate: [-6, 12, -14, 8, -6],
+                }}
+                transition={{ duration: 55, repeat: Infinity, ease: "easeInOut" }}
+            >
+                <div className="relative flex items-center justify-center">
+                    <GeometryHalo />
+                    <motion.div className="relative" animate={{ y: [0, -10, 0] }} transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}>
+                        <AstronautSvg />
+                    </motion.div>
+                </div>
+            </motion.div>
+        </motion.div>
+    );
+}
+
+/** Day mode: reclined in the meadow instead of roaming — rotated onto its
+ *  back, parked low on the page, a slow breathing bob instead of a flight
+ *  path. Echoes the "astronaut resting in a flower field" mood without
+ *  using anyone else's photo. */
+function DayAstronaut() {
+    const parallax = useParallax(10);
+    return (
+        <motion.div
+            aria-hidden="true"
+            className="pointer-events-none fixed z-[6]"
+            // clear of the space-mode toggle buttons parked in the
+            // bottom-left corner, low enough to sit in the (now shorter)
+            // meadow strip rather than floating above it
+            style={{ left: "26vw", bottom: "2vh", x: parallax.x, y: parallax.y, rotate: -78 }}
+        >
+            <motion.div animate={{ rotate: [0, 1.5, 0] }} transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}>
+                <AstronautSvg />
+            </motion.div>
+        </motion.div>
+    );
+}
+
 export function Astronaut() {
     const { enabled: spaceOn } = useSpaceMode();
+    const { time } = useSpaceTime();
     const { enabled: motionEnabled } = useMotionPreference();
 
     if (!spaceOn || !motionEnabled) return null;
 
-    return (
-        <motion.div
-            aria-hidden="true"
-            className="pointer-events-none fixed top-0 left-0 z-40"
-            animate={{
-                x: ["6vw", "68vw", "40vw", "82vw", "6vw"],
-                y: ["12vh", "32vh", "62vh", "22vh", "12vh"],
-                rotate: [-6, 12, -14, 8, -6],
-            }}
-            transition={{ duration: 55, repeat: Infinity, ease: "easeInOut" }}
-        >
-            <div className="relative flex items-center justify-center">
-                <GeometryHalo />
-                <motion.div
-                    className="relative"
-                    animate={{ y: [0, -10, 0] }}
-                    transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-                >
-                    <AstronautSvg />
-                </motion.div>
-            </div>
-        </motion.div>
-    );
+    return time === "night" ? <NightAstronaut /> : <DayAstronaut />;
 }

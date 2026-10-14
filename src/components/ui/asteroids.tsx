@@ -2,7 +2,9 @@
 
 import { motion } from "framer-motion";
 import { useSpaceMode } from "@/components/layout/space-mode";
+import { useSpaceTime } from "@/components/layout/space-time";
 import { useMotionPreference } from "@/components/layout/motion-preference";
+import { useParallax } from "@/components/layout/parallax";
 
 interface AsteroidSpec {
     points: string;
@@ -46,26 +48,33 @@ const ASTEROIDS: AsteroidSpec[] = [
     },
 ];
 
+function Asteroid({ a, index }: { a: AsteroidSpec; index: number }) {
+    const parallax = useParallax(24);
+    return (
+        <motion.div aria-hidden="true" className="pointer-events-none fixed top-0 left-0 z-[5]" style={{ x: parallax.x, y: parallax.y }}>
+            <motion.div
+                animate={{ x: a.path.x, y: a.path.y, rotate: [0, 180, 360] }}
+                transition={{ duration: a.duration, repeat: Infinity, ease: "linear", delay: index * 3 }}
+            >
+                <svg width={a.size} height={a.size} viewBox="0 0 16 16" aria-hidden="true">
+                    <polygon points={a.points} fill={a.fill} stroke="#352f28" strokeWidth="0.6" />
+                </svg>
+            </motion.div>
+        </motion.div>
+    );
+}
+
 export function Asteroids() {
     const { enabled: spaceOn } = useSpaceMode();
+    const { time } = useSpaceTime();
     const { enabled: motionEnabled } = useMotionPreference();
 
-    if (!spaceOn || !motionEnabled) return null;
+    if (!spaceOn || !motionEnabled || time !== "night") return null;
 
     return (
         <>
             {ASTEROIDS.map((a, i) => (
-                <motion.div
-                    key={i}
-                    aria-hidden="true"
-                    className="pointer-events-none fixed top-0 left-0 z-[5]"
-                    animate={{ x: a.path.x, y: a.path.y, rotate: [0, 180, 360] }}
-                    transition={{ duration: a.duration, repeat: Infinity, ease: "linear", delay: i * 3 }}
-                >
-                    <svg width={a.size} height={a.size} viewBox="0 0 16 16" aria-hidden="true">
-                        <polygon points={a.points} fill={a.fill} stroke="#352f28" strokeWidth="0.6" />
-                    </svg>
-                </motion.div>
+                <Asteroid key={i} a={a} index={i} />
             ))}
         </>
     );

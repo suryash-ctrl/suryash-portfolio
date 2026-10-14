@@ -1,8 +1,11 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { motion } from "framer-motion";
 import { useSpaceMode } from "@/components/layout/space-mode";
+import { useSpaceTime } from "@/components/layout/space-time";
 import { useMotionPreference } from "@/components/layout/motion-preference";
+import { useParallax } from "@/components/layout/parallax";
 
 interface Star {
     x: number;
@@ -20,13 +23,16 @@ const STAR_COLORS = ["#eef3ff", "#eef3ff", "#eef3ff", "#cfe0ff", "#ffe9d6", "#e3
 
 export function Starfield() {
     const { enabled } = useSpaceMode();
+    const { time } = useSpaceTime();
     const { enabled: motionEnabled } = useMotionPreference();
+    const parallax = useParallax(10);
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const starsRef = useRef<Star[]>([]);
     const frameRef = useRef<number>(0);
+    const active = enabled && time === "night";
 
     useEffect(() => {
-        if (!enabled) return;
+        if (!active) return;
         const canvasEl = canvasRef.current;
         if (!canvasEl) return;
         const canvas: HTMLCanvasElement = canvasEl;
@@ -109,15 +115,16 @@ export function Starfield() {
             cancelAnimationFrame(frameRef.current);
             window.removeEventListener("resize", resize);
         };
-    }, [enabled, motionEnabled]);
+    }, [active, motionEnabled]);
 
-    if (!enabled) return null;
+    if (!active) return null;
 
     return (
-        <canvas
+        <motion.canvas
             ref={canvasRef}
             aria-hidden="true"
             className="pointer-events-none fixed inset-0 z-0"
+            style={{ x: parallax.x, y: parallax.y }}
         />
     );
 }
