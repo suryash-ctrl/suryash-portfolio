@@ -1,4 +1,4 @@
-import { ScrollCinema } from "@/components/sections/scroll-cinema";
+import { HeroGrid } from "@/components/sections/hero-grid";
 import { HeroIntro } from "@/components/sections/hero-intro";
 import { MarqueeStrip } from "@/components/sections/marquee-strip";
 import { HeroBanner } from "@/components/sections/hero-banner";
@@ -17,7 +17,7 @@ export default function Home() {
     return (
         <MotionProvider>
             <main className="mx-auto flex w-full max-w-2xl flex-col px-6 pt-0 pb-0">
-                <ScrollCinema />
+                <HeroGrid />
                 <div className="mt-12">
                     <HeroIntro />
                 </div>

@@ -42,7 +42,7 @@ export function Navbar() {
         <nav className="sticky top-0 z-50 w-full bg-bg-primary/80 backdrop-blur-lg backdrop-saturate-180">
             <div className="mx-auto flex max-w-2xl items-center justify-between px-6 py-2">
                 <Link href="/" className="group focus-visible:text-accent-primary">
-                    <span className={cn("font-micro text-[40px] leading-none transition-colors duration-200", isHome ? "text-accent-primary" : "text-text-primary group-hover:text-accent-primary")}>
+                    <span className={cn("font-display text-[20px] leading-none tracking-[0.28em] transition-colors duration-200", isHome ? "text-accent-primary" : "text-text-primary group-hover:text-accent-primary")}>
                         <span className="hidden min-[360px]:inline">SURYASH</span>
                         <span className="inline min-[360px]:hidden">S</span>
                     </span>

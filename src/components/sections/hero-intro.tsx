@@ -16,7 +16,7 @@ export function HeroIntro() {
                     <h1 className="sr-only">Suryash Raj — digital marketing, operations, customer success</h1>
 
                     <div>
-                        <span className="block font-micro text-[28px] leading-none text-text-primary min-[480px]:text-[32px]">Suryash Raj.</span>
+                        <span className="block font-display text-[28px] leading-none text-text-primary min-[480px]:text-[32px]">Suryash Raj.</span>
                         <span className="mt-1 block font-jetbrains text-[12px] uppercase tracking-[0.15em] text-accent-primary">
                             Digital marketing · operations · customer success
                         </span>

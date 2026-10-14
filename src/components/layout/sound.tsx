@@ -5,14 +5,19 @@ import { createContext, useContext, useEffect, useState, useCallback } from "rea
 const STORAGE_KEY = "suryash-sound";
 
 interface SoundValue {
+    /** visitor wants sound */
     enabled: boolean;
+    /** the browser has actually let the audio start (needs a click/tap/key) */
+    unlocked: boolean;
+    setUnlocked: (v: boolean) => void;
     toggle: () => void;
 }
 
-const SoundContext = createContext<SoundValue>({ enabled: true, toggle: () => {} });
+const SoundContext = createContext<SoundValue>({ enabled: true, unlocked: false, setUnlocked: () => {}, toggle: () => {} });
 
 export function SoundProvider({ children }: { children: React.ReactNode }) {
     const [enabled, setEnabled] = useState(true);
+    const [unlocked, setUnlocked] = useState(false);
 
     useEffect(() => {
         try {
@@ -35,7 +40,7 @@ export function SoundProvider({ children }: { children: React.ReactNode }) {
         });
     }, []);
 
-    return <SoundContext.Provider value={{ enabled, toggle }}>{children}</SoundContext.Provider>;
+    return <SoundContext.Provider value={{ enabled, unlocked, setUnlocked, toggle }}>{children}</SoundContext.Provider>;
 }
 
 export function useSound() {

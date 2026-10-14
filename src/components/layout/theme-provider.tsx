@@ -10,7 +10,8 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
   return (
     <NextThemesProvider
       attribute="class"
-      defaultTheme="system"
+      defaultTheme="dark"
+      storageKey="suryash-theme"
       disableTransitionOnChange
     >
       {children}

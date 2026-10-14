@@ -83,11 +83,11 @@ export function ImpactStrip() {
     return (
         <section className="mt-24" aria-label="Impact snapshot">
             <motion.h2
-                className="font-micro text-[40px] leading-none text-text-primary"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
+                className="font-display text-[40px] leading-none text-text-primary"
+                initial={{ clipPath: "inset(0% 0% 100% 0%)", y: 24 }}
+                whileInView={{ clipPath: "inset(0% 0% 0% 0%)", y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.5, ease }}
+                transition={{ duration: 0.9, ease }}
             >
                 IMPACT
             </motion.h2>

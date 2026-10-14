@@ -69,27 +69,29 @@ html {
    DARK THEME (overrides :root when .dark is on <html>)
    ============================================ */
 .dark {
-    --bg-primary: oklch(0.1 0.006 235);
-    --bg-secondary: oklch(0.15 0.008 235);
-    --bg-tertiary: oklch(0.2 0.01 235);
-    --bg-surface: oklch(0.25 0.01 235);
-    --text-primary: oklch(0.96 0.006 235);
-    --text-secondary: oklch(0.72 0.01 235);
-    --text-tertiary: oklch(0.66 0.008 235);
-    --text-muted: oklch(0.6 0.006 235);
-    --border-default: oklch(0.25 0.01 235);
-    --border-subtle: oklch(0.18 0.008 235);
-    --border-strong: oklch(0.32 0.011 235);
+    /* Graphite — near-neutral charcoal, the grid and particle field read
+       best on a ground with almost no hue of its own. */
+    --bg-primary: oklch(0.205 0.002 240);
+    --bg-secondary: oklch(0.235 0.003 240);
+    --bg-tertiary: oklch(0.275 0.004 240);
+    --bg-surface: oklch(0.31 0.004 240);
+    --text-primary: oklch(0.94 0.003 240);
+    --text-secondary: oklch(0.79 0.004 240);
+    --text-tertiary: oklch(0.68 0.004 240);
+    --text-muted: oklch(0.6 0.004 240);
+    --border-default: oklch(0.32 0.004 240);
+    --border-subtle: oklch(0.27 0.003 240);
+    --border-strong: oklch(0.4 0.005 240);
 
-    /* Accents — brighter in dark mode for contrast */
-    --accent-primary: oklch(0.62 0.16 215);
-    --accent-primary-hover: oklch(0.56 0.15 215);
-    --accent-primary-muted: oklch(0.62 0.16 215 / 0.08);
-    --accent-secondary: oklch(0.62 0.098 170);
-    --accent-tertiary: oklch(0.6 0.098 40);
-    --pixel-orange: oklch(0.64 0.17 215);
-    --status-error: oklch(0.6 0.15 25);
-    --status-warning: oklch(0.72 0.14 85);
+    /* Accents — teal primary, amber secondary for the particle palette */
+    --accent-primary: oklch(0.76 0.12 185);
+    --accent-primary-hover: oklch(0.7 0.12 185);
+    --accent-primary-muted: oklch(0.76 0.12 185 / 0.1);
+    --accent-secondary: oklch(0.78 0.13 75);
+    --accent-tertiary: oklch(0.72 0.1 150);
+    --pixel-orange: oklch(0.74 0.15 55);
+    --status-error: oklch(0.66 0.16 25);
+    --status-warning: oklch(0.78 0.14 85);
 }
 
 /* ============================================
@@ -99,7 +101,7 @@ html {
     /* Fonts */
     --font-space: var(--font-space);
     --font-jetbrains: var(--font-jetbrains);
-    --font-micro: var(--font-micro);
+    --font-display: var(--font-display);
 
     /* Background colors */
     --color-bg-primary: var(--bg-primary);
@@ -294,21 +296,9 @@ body {
     }
 }
 
-/* ============================================
-   CINEMA — film grain for the opening sequence.
-   An SVG fractal-noise tile, jittered in steps so
-   it reads as grain rather than a sliding texture.
-   ============================================ */
-.cinema-grain {
-    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
-    animation: cinema-grain 0.9s steps(6) infinite;
-}
-
-@keyframes cinema-grain {
-    0% { transform: translate(0, 0); }
-    20% { transform: translate(-3%, 2%); }
-    40% { transform: translate(2%, -3%); }
-    60% { transform: translate(-2%, -1%); }
-    80% { transform: translate(3%, 3%); }
-    100% { transform: translate(0, 0); }
+/* Display face: Montserrat, set light and slightly open — the thin,
+   wide-tracked headline voice the grid layout is built around. */
+.font-display {
+    font-weight: 300;
+    letter-spacing: 0.03em;
 }

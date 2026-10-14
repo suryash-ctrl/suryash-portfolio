@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
-import { spaceGrotesk, jetbrainsMono, micro5 } from "@/lib/fonts";
+import { spaceGrotesk, jetbrainsMono, display } from "@/lib/fonts";
 import { ThemeProvider } from "@/components/layout/theme-provider";
 import { MotionPreferenceProvider } from "@/components/layout/motion-preference";
 import { SoundProvider } from "@/components/layout/sound";
@@ -12,6 +12,9 @@ import { ThemePicker } from "@/components/ui/theme-picker";
 import { CursorTrail } from "@/components/ui/cursor-trail";
 import { SpaceAudio } from "@/components/ui/space-audio";
 import { SoundToggle } from "@/components/ui/sound-toggle";
+import { GridOverlay } from "@/components/ui/grid-overlay";
+import { ParticleField } from "@/components/ui/particle-field";
+import { ScrollRuler } from "@/components/ui/scroll-ruler";
 import { SITE } from "@/config/site";
 import "./globals.css";
 
@@ -71,7 +74,7 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html lang="en" className={`${spaceGrotesk.variable} ${jetbrainsMono.variable} ${micro5.variable}`} suppressHydrationWarning>
+        <html lang="en" className={`${spaceGrotesk.variable} ${jetbrainsMono.variable} ${display.variable}`} suppressHydrationWarning>
             <body className="flex min-h-screen flex-col" suppressHydrationWarning>
                 <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
                 <ThemeProvider>
@@ -84,6 +87,8 @@ export default function RootLayout({
                                 >
                                     skip → main
                                 </a>
+                                <GridOverlay />
+                                <ParticleField />
                                 <SpaceAudio />
                                 <Navbar />
                                 <ThemeKeys />
@@ -91,6 +96,7 @@ export default function RootLayout({
                                 <div id="main" className="relative z-10 flex-1">{children}</div>
                                 <ThemePicker />
                                 <SoundToggle />
+                                <ScrollRuler />
                             </ParallaxProvider>
                         </SoundProvider>
                     </MotionPreferenceProvider>

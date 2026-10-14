@@ -224,11 +224,11 @@ export function Connections() {
     return (
         <section id="contact" className="mt-16 scroll-mt-16 min-[480px]:mt-24" aria-label="Get in touch">
             <motion.h2
-                className="font-micro text-[40px] leading-none text-text-primary"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
+                className="font-display text-[40px] leading-none text-text-primary"
+                initial={{ clipPath: "inset(0% 0% 100% 0%)", y: 24 }}
+                whileInView={{ clipPath: "inset(0% 0% 0% 0%)", y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.5, ease }}
+                transition={{ duration: 0.9, ease }}
             >
                 GET IN TOUCH
             </motion.h2>

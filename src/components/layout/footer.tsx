@@ -39,7 +39,7 @@ export function Footer() {
 
             {/* Giant brand text — fills content width, centered, bottom-aligned */}
             <div className="relative mx-auto max-w-2xl overflow-hidden px-6" style={{ containerType: "inline-size" }}>
-                <span className="block select-none leading-[0.65] text-center font-micro  text-accent-primary" style={{ fontSize: "32cqw" }} aria-hidden="true">
+                <span className="block select-none leading-[0.65] text-center font-display  text-accent-primary" style={{ fontSize: "32cqw" }} aria-hidden="true">
                     SURYASH
                 </span>
 

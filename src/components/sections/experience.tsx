@@ -141,7 +141,7 @@ function WorkCard({ entry, index }: { entry: ExperienceEntry; index: number }) {
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
                     <Monogram company={entry.company} />
-                    <span className="font-micro text-xl leading-none text-text-primary min-[480px]:text-2xl">
+                    <span className="font-display text-xl leading-none text-text-primary min-[480px]:text-2xl">
                         {entry.company.toUpperCase()}
                     </span>
                 </div>
@@ -302,7 +302,7 @@ export function Experience() {
     return (
         <section id="experience" className="mt-24 scroll-mt-16">
             <div className="flex flex-wrap items-center justify-between gap-4">
-                <h2 className="font-micro text-[40px] leading-none text-text-primary">EXPERIENCE</h2>
+                <h2 className="font-display text-[40px] leading-none text-text-primary">EXPERIENCE</h2>
                 <div className="flex flex-wrap gap-1.5">
                     {FILTERS.map((f) => (
                         <button

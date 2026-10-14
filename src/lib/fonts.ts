@@ -1,4 +1,4 @@
-import { Space_Grotesk, JetBrains_Mono, Micro_5 } from "next/font/google";
+import { Space_Grotesk, JetBrains_Mono, Montserrat } from "next/font/google";
 
 export const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
@@ -12,9 +12,9 @@ export const jetbrainsMono = JetBrains_Mono({
   variable: "--font-jetbrains",
 });
 
-export const micro5 = Micro_5({
-  weight: "400",
+export const display = Montserrat({
+  weight: ["200", "300", "400"],
   subsets: ["latin"],
   display: "swap",
-  variable: "--font-micro",
+  variable: "--font-display",
 });
